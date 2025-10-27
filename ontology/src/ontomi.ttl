@@ -1,28 +1,35 @@
 @prefix bfo:  <http://purl.obolibrary.org/obo/BFO_> .
 @prefix iao:  <http://purl.obolibrary.org/obo/IAO_> .
-@prefix onto: <https://w3id.org/ontomi#> .
+@prefix onto: <https://techcoop.com.br/ontomi#> .
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
-@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix dct:  <http://purl.org/dc/terms/> . 
 @prefix vann: <http://purl.org/vocab/vann/> .
 
 #################################################################
 # Ontology header / metadados
 #################################################################
-<https://w3id.org/ontomi>
+<https://techcoop.com.br/ontomi>
   a owl:Ontology ;
-  owl:versionIRI <https://w3id.org/ontomi/2025-10> ;
-  dct:title "OntoMI: Ontology for Multiple Intelligences in Educational Texts"@en ,
-            "OntoMI: Ontologia para Inteligências Múltiplas em Textos Educacionais"@pt ;
-  dct:creator "Jefferson Rodrigo Speck" ;
-  dct:created "2025-10-26"^^xsd:date ;
-  dct:modified "2025-10-26"^^xsd:date ;
-  dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+  owl:versionIRI   <https://techcoop.com.br/ontomi/2025-10> ;
+  owl:versionInfo  "1.1.0 (2025-10-27)" ;
+  dct:title        "OntoMI: Ontology for Multiple Intelligences in Educational Texts"@en ,
+                   "OntoMI: Ontologia para Inteligências Múltiplas em Textos Educacionais"@pt ;
+  dct:isVersionOf  <https://techcoop.com.br/ontomi> ;
+  dct:source       <https://techcoop.com.br/uploads/download/file/93/ontomi.ttl> ;
+  dct:publisher    <https://orcid.org/0009-0009-3964-9185> ;
+  dct:creator      "Jefferson Rodrigo Speck" ;
+  dct:created      "2025-10-26"^^xsd:date ;
+  dct:modified     "2025-10-27"^^xsd:date ;
+  dct:license      <https://creativecommons.org/licenses/by/4.0/> ;
   vann:preferredNamespacePrefix "onto" ;
-  vann:preferredNamespaceUri "https://w3id.org/ontomi#" ;
+  vann:preferredNamespaceUri    "https://techcoop.com.br/ontomi#" ;
+  owl:imports
+      <http://purl.obolibrary.org/obo/bfo.owl> ,
+      <http://purl.obolibrary.org/obo/iao.owl> ;
   rdfs:comment "Núcleo alinhado a BFO (Disposition/Process) e IAO (ICE/is about). Validação por SHACL. Perfil sugerido: OWL 2 EL + SHACL."@pt .
 
 #################################################################
@@ -46,8 +53,9 @@ onto:Intelligence a owl:Class ;
 onto:IntelligenceDisposition a owl:Class ;
   rdfs:label "Intelligence Disposition"@en , "Disposição de inteligência"@pt ;
   rdfs:comment "Type of realizable cognitive disposition aligned with Gardner's MI; realizable entity in the BFO sense."@en ,
-               "Tipo de disposição cognitiva realizável alinhada à TIM de Gardner; entidade realizável no sentido do BFO."@pt ;
-  rdfs:subClassOf bfo:0000016 .
+              "Tipo de disposição cognitiva realizável alinhada à TIM de Gardner; entidade realizável no sentido do BFO."@pt ;
+  rdfs:subClassOf bfo:0000016 ; # BFO:Disposition
+  iao:0000115 "Realizable cognitive disposition as per Gardner's MI; realizable entity in BFO."@en .
 
 # Específicas (TIM)
 onto:LinguisticIntelligence a owl:Class ;
@@ -196,6 +204,11 @@ onto:hasActivation a owl:ObjectProperty ;
   rdfs:domain onto:ExplanationFragment ;
   rdfs:range  onto:IntelligenceActivation .
 
+onto:isActivationOf a owl:ObjectProperty ;
+  owl:inverseOf onto:hasActivation ;
+  rdfs:domain onto:IntelligenceActivation ;
+  rdfs:range  onto:ExplanationFragment .  
+
 onto:hasPrimaryActivation a owl:ObjectProperty , owl:FunctionalProperty ;
   rdfs:label "hasPrimaryActivation"@en , "temAtivaçãoPrimária"@pt ;
   rdfs:domain onto:ExplanationFragment ;
@@ -231,6 +244,20 @@ onto:miVector a owl:DatatypeProperty , owl:FunctionalProperty ;
   rdfs:domain onto:MIProfileVector ;
   rdfs:range  xsd:string .
 
+onto:hasProfileVector a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:domain onto:ExplanationFragment ;
+  rdfs:range  onto:MIProfileVector .
+
+# 8 posições do vetor (0..1)
+onto:hasLinguisticScore            a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain onto:MIProfileVector ; rdfs:range xsd:decimal .
+onto:hasLogicalMathematicalScore   a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain onto:MIProfileVector ; rdfs:range xsd:decimal .
+onto:hasSpatialScore               a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain onto:MIProfileVector ; rdfs:range xsd:decimal .
+onto:hasBodilyKinestheticScore     a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain onto:MIProfileVector ; rdfs:range xsd:decimal .
+onto:hasMusicalScore               a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain onto:MIProfileVector ; rdfs:range xsd:decimal .
+onto:hasInterpersonalScore         a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain onto:MIProfileVector ; rdfs:range xsd:decimal .
+onto:hasIntrapersonalScore         a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain onto:MIProfileVector ; rdfs:range xsd:decimal .
+onto:hasNaturalistScore            a owl:DatatypeProperty , owl:FunctionalProperty ; rdfs:domain onto:MIProfileVector ; rdfs:range xsd:decimal .
+
 #################################################################
 # Axiomas auxiliares
 #################################################################
@@ -240,7 +267,19 @@ onto:miVector a owl:DatatypeProperty , owl:FunctionalProperty ;
    owl:annotatedTarget "Convenção: toda ativação ligada por hasPrimaryActivation deve ter hasActivationType onto:Primary."@pt .
 
 [] a owl:AllDisjointClasses ;
-   owl:members ( onto:Keyword onto:ContextObject onto:DiscursiveStrategy ) .
+   owl:members ( 
+     onto:LinguisticIntelligence
+     onto:LogicalMathematicalIntelligence
+     onto:SpatialIntelligence
+     onto:BodilyKinestheticIntelligence
+     onto:MusicalIntelligence
+     onto:InterpersonalIntelligence
+     onto:IntrapersonalIntelligence
+     onto:NaturalistIntelligence
+     onto:Keyword 
+     onto:ContextObject 
+     onto:DiscursiveStrategy     
+   ) .
 
 #################################################################
 # SHACL (regras de validação de instâncias)

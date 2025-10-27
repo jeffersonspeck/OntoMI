@@ -1,133 +1,92 @@
-# OntoMI — SABiOx Readme
+# From “101” to SABiOx — Evolution at a Glance
 
-This repository packages **OntoMI** following the **SABiOx** (Extended Systematic Approach for Building Ontologies) life-cycle.  
-It preserves the 101-built operational core and documents the evolution to a mature, interoperable artifact grounded on **BFO** and **IAO**, with OBO-style annotations.
+OntoMI started as a **101-style** ontology (Noy & McGuinness): lightweight scoping, informal **competency questions (CQs)**, quick concept listing, and direct OWL encoding for fast iteration and demos.
 
-> Key refs: Noy & McGuinness (101), ISO/IEC 21838-2 (BFO), BFO-2020 site, IAO (OBO Foundry), Arp–Smith–Spear, Aguiar & Souza (SABiOx). See `citations/references.bib`.
+It has since evolved into a **SABiOx**-guided artifact with:
 
----
+* **Process structure** across phases (Requirements → Setup → Capture → Design → Implementation → Publication), with explicit **supporting activities** (KNO, REU, DOC, MAN, EVA, PUB).
+* **Foundational grounding** (BFO/IAO) and OBO-style annotations.
+* **Traceability**: CQ → model elements → SPARQL queries → instances → evaluation.
+* **Configuration management** (versioning, changelog, releases) and **quality gates** (reasoner checks + SPARQL integrity).
 
-## 1) Repository layout
-
-```
-.
-├── ontology/
-│   ├── src/
-│   │   └── ontomi.ttl                 # operational ontology (main, in Turtle)
-│   ├── profiles/
-│   │   └── profiles.md                # OWL profile, IRIs, naming, annotation policy (OBO-style)
-│   └── releases/
-│       ├── vX.Y.Z/
-│       │   ├── ontomi.ttl
-│       │   ├── checks/                # reasoner reports, SPARQL validation
-│       │   └── RELEASE-NOTES.md
-│       └── CHANGELOG.md
-├── docs/
-│   ├── bfo-alignment.md               # mapping OntoMI ↔ BFO/IAO (classes & properties)
-│   ├── design-decisions.md            # rationale for modeling choices
-│   ├── cq-guide.md                    # CQ1–CQ3 queries + how to run them
-│   ├── evaluation-plan.md             # metrics, datasets, acceptance criteria
-│   └── sabiox-readme.md               # (this document; duplicate kept in /docs for GitHub Pages)
-├── evaluation/
-│   ├── cq/
-│   │   ├── cq1.rq                     # “which intelligences are evoked in a fragment?”
-│   │   ├── cq2.rq                     # “which elements contributed to each evocation?”
-│   │   └── cq3.rq                     # “which intelligence is most intense (primary)?”
-│   ├── consistency/
-│   │   └── integrity-queries.rq       # domain/range/functional/disjointness checks
-│   └── tests/
-│       └── regression.md              # how to run repeatable checks per release
-├── examples/
-│   ├── instances.ttl                  # canonical instances (e.g., Newton’s First Law example)
-│   └── shapes/                        # optional SHACL/SHEXC shapes (if adopted; create if needed)
-├── datasets/
-│   └── demo/                          # small corpora for demonstration & evaluation
-├── citations/
-│   └── references.bib                 # BibTeX (BFO/IAO/101/SABiOx/etc.)
-└── README.md                          # short project overview for newcomers
-```
-
-> **Note**: Per your decision, there is **no** separate `alignments.ttl`. The BFO/IAO alignment is *embedded in the main ontology* (`ontology/src/ontomi.ttl`). The mapping is documented in `docs/bfo-alignment.md`.
+Below you will find a concise menu for each SABiOx phase. Each page briefly recaps the **101 baseline** and documents the **SABiOx extensions** you are using now.
 
 ---
 
-## 2) SABiOx life-cycle traceability
+## SABiOx Documentation Menu
 
-### Requirements
-- **Artifacts**: `docs/cq-guide.md`, `docs/evaluation-plan.md`
-- **Content**: domain/scope, **CQ1–CQ3** as functional requirements, non-functional goals (interoperability, quality metrics), traceability CQ → SPARQL → instances.
+> All documents live in `docs/` unless noted. Relative links assume repository root.
 
-### Setup
-- **Artifacts**: `docs/bfo-alignment.md`, `ontology/profiles/profiles.md`, `docs/design-decisions.md`
-- **Content**: foundational ontology = **BFO** (ISO/IEC 21838-2) + **IAO** for information artifacts; IRIs & naming; acceptance criteria for concepts & properties; reuse policy.
+### 1) Requirements
 
-### Capture
-- **Artifacts**: `ontology/src/ontomi.ttl` (maintained by you), `docs/design-decisions.md`
-- **Content**: classes, hierarchies, properties, axioms; disjointness; domain/range minimality; BFO-guided analysis (continuant/occurrent; ICE; dispositions).
-
-### Design
-- **Artifacts**: `ontology/profiles/profiles.md`, `docs/evaluation-plan.md`
-- **Content**: OWL 2 DL profile; OBO-style annotations; versioning policy; design for heuristics queries and **MI vector** result artifact (8-position vector from `hasActivationScore`).
-
-### Implementation
-- **Artifacts**: `ontology/releases/`, `evaluation/` (CQ SPARQLs, consistency checks), `examples/instances.ttl`
-- **Content**: operational TTL; canonical instances; automated checks (reasoners + SPARQL); changelog; release notes; publication instructions.
-
-### Supporting activities (consolidated)
-Knowledge acquisition; documentation; configuration management; evaluation; reuse; publication. See `docs/` and `ontology/releases/`.
+perfeito — segue o mesmo trecho com **links clicáveis** (relativos ao repo). É só colar no README:
 
 ---
 
-## 3) BFO/IAO alignment (summary)
+### 1) Requirements
 
-- **Top-level**: BFO distinguishes **continuants** vs **occurrents**.  
-- **Information**: explanatory artifacts (fragments/elements) as **IAO:Information Content Entity** (ICE; generically dependent continuant).  
-- **Events**: `IntelligenceActivation` as **BFO:process** (occurrence).  
-- **Results**: `MIVector` as **IAO:Data item/Data set** (8-position vector from activation scores).  
-- **Aboutness**: evidence/activations use **IAO:is_about** to connect content to `Intelligence` (concept).  
-Full mapping in `docs/bfo-alignment.md`.
+* **File:** [`docs/sabiox-requirements.md`](docs/sabiox-requirements.md)
+* **What changed vs. 101:** 101 CQs são mantidas, e o SABiOx adiciona **non-functional requirements**, **interoperability goals** e **CQ→Query→Instance** traceability.
+* **Includes:** domain & scope; CQ1–CQ3; NFRs; initial evaluation criteria; traceability matrix.
 
----
+### 2) Setup
 
-## 4) Validation
+* **File:** [`docs/sabiox-setup.md`](docs/sabiox-setup.md)
+* **What changed vs. 101:** de escolhas ad-hoc para **seleções explícitas**: **modeling language**, **foundational ontology (BFO/IAO)**, **reuse policy** e **concept inclusion criteria**.
+* **Includes:** chosen language (conceptual), foundational patterns, reuse candidates, acceptance criteria.
 
-- **Reasoner**: HermiT/Pellet/ELK on `ontology/src/ontomi.ttl`.
-- **CQs**: run SPARQL in `evaluation/cq/*.rq` against ontology + `examples/instances.ttl`.
-- **Integrity**: `evaluation/consistency/integrity-queries.rq`.
+### 3) Capture (Reference Ontology)
 
----
+* **File:** [`docs/sabiox-capture.md`](docs/sabiox-capture.md)
+* **What changed vs. 101:** além de lista de classes/propriedades, o SABiOx pede **concept cataloging**, **views de ontologias reutilizadas**, **axioms**, **modularization** e um **Reference Ontology Document**.
+* **Includes:** concept catalog, ontology views, axioms (informal/formal), modularization diagram, model dictionary.
 
-## 5) MI vector artifact
+### 4) Design (Operational Decisions)
 
-- Class: `MIVector` (IAO data item).
-- Link: `hasMIVector(ExplanationFragment, MIVector)`.
-- Data: eight decimals via `hasVectorPosition` (fixed order documented in `docs/cq-guide.md`).
-- Source: aggregated from `hasActivationScore` on each `IntelligenceActivation`.
+* **File:** [`docs/sabiox-design.md`](docs/sabiox-design.md)
+* **What changed vs. 101:** explicita **OWL 2 DL profile** e **encoding rules**; define **vocabularies**, **naming/IRI policy** e **module architecture**.
+* **Includes:** encoding language, vocabularies (BFO/IAO/…), coding rules, file/module architecture.
 
----
+### 5) Implementation (Operational Ontology)
 
-## 6) Versioning & releases
+* **File:** [`docs/sabiox-implementation.md`](docs/sabiox-implementation.md)
+* **What changed vs. 101:** codificação guiada pelo Design; **classes/relations/axioms** com **releases versionadas** e **automação de checks**.
+* **Includes:** como o [`ontology/src/ontomi.ttl`](ontology/src/ontomi.ttl) é estruturado; release pipeline; metadata (`owl:versionIRI`, `dct:*`).
 
-- Semantic versioning `vMAJOR.MINOR.PATCH`.
-- Each release: `ontomi.ttl`, reasoner report, CQ results, `RELEASE-NOTES.md`.
-- Summaries in `ontology/releases/CHANGELOG.md`.
+### 6) Evaluation & Validation
 
----
+* **File:** [`docs/sabiox-evaluation.md`](docs/sabiox-evaluation.md)
+* **What changed vs. 101:** formaliza **subontology/integration/ontology tests**, **reasoner checks**, **SPARQL para CQ1–CQ3** e (opcional) **SHACL**.
+* **Includes:** how to run reasoner; queries em `evaluation/cq/` — [`cq1.rq`](evaluation/cq/cq1.rq), [`cq2.rq`](evaluation/cq/cq2.rq), [`cq3.rq`](evaluation/cq/cq3.rq); integrity queries; acceptance thresholds.
 
-## 7) How to cite
+### 7) Publication & Releases
 
-Citations are prepacked in `citations/references.bib` (BFO/IAO/101/SABiOx/etc.).
-
----
-
-## 8) Contributing
-
-1. Fork and create a feature branch.
-2. Edit `ontology/src/ontomi.ttl` (BFO/IAO alignment lives inside the file).
-3. Adjust CQ queries or tests in `evaluation/`.
-4. Run reasoner + SPARQL checks; attach a brief report in PR.
-5. Follow naming/annotation rules in `ontology/profiles/profiles.md`.
+* **File:** [`docs/sabiox-publication.md`](docs/sabiox-publication.md)
+* **What changed vs. 101:** padroniza **SemVer**, **CHANGELOG**, **release notes** e artefatos de distribuição.
+* **Includes:** layout de [`ontology/releases/`](ontology/releases/); o que incluir (TTL, reports, CQ results); citação & licensing — veja também [`ontology/releases/CHANGELOG.md`](ontology/releases/CHANGELOG.md).
 
 ---
 
-© OntoMI contributors. See `LICENSE` for terms.
+## Quick Links (Artifacts & Helpers)
+
+* **Ontology (operational):** `ontology/src/ontomi.ttl`
+* **Profiles & policy:** `ontology/profiles/profiles.md`
+* **BFO/IAO alignment (summary):** `docs/bfo-alignment.md`
+* **Design decisions:** `docs/design-decisions.md`
+* **CQ queries:** `evaluation/cq/` (`cq1.rq`, `cq2.rq`, `cq3.rq`)
+* **Integrity checks:** `evaluation/consistency/integrity-queries.rq`
+* **Examples:** `examples/instances.ttl`
+* **Releases:** `ontology/releases/` (`CHANGELOG.md`, per-version `checks/` & `RELEASE-NOTES.md`)
+* **Citations:** `citations/references.bib`
+
+---
+
+## How to Read This Repository
+
+1. **Start** with `sabiox-requirements.md` to understand scope, CQs, and NFRs.
+2. **Check** `sabiox-setup.md` for foundational choices (BFO/IAO) and reuse policy.
+3. **Review** `sabiox-capture.md` to see the reference model decisions and modularization.
+4. **Follow** `sabiox-design.md` for encoding rules and OWL profile.
+5. **Implement/inspect** `ontology/src/ontomi.ttl` with guidance from `sabiox-implementation.md`.
+6. **Validate** with `sabiox-evaluation.md`, running the reasoner and SPARQL (CQ1–CQ3).
+7. **Publish** per `sabiox-publication.md`, updating releases and changelog.
