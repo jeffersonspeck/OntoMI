@@ -55,22 +55,42 @@ The ontology, rationale, and evaluation (competency questions, instances, and qu
 ```
 .
 ├── ontology/
-│   ├── OntoMI_unificada_bfo.ttl        # Core ontology (TTL, OWL 2 DL)
-│   └── profiles/                        # Profiles & coding rules (OWL/IRIs/name styles)
+│ ├── src/
+│ │ ├── ontomi.ttl                # operational ontology (main)
+│ │ ├── alignments.ttl            # BFO/IAO alignment axioms (subClassOf/subPropertyOf)
+│ │ ├── modules/                  # optional modules (e.g., elements/, activations/, vector/)
+│ │ └── patterns/                 # reusable fragments (annotation patterns, aboutness, data-vec)
+│ ├── profiles/
+│ │ └── profiles.md               # OWL profile, IRIs, naming, annotation policy (OBO-style)
+│ └── releases/
+│   ├── v1.1.0/
+│   │ ├── ontomi.ttl
+│   │ ├── checks/             # reasoner reports, SPARQL validation
+│   │ └── RELEASE-NOTES.md
+│   └── CHANGELOG.md
 ├── docs/
-│   ├── sabiox-readme.md                 # SABiOx life-cycle & process (project-level)
-│   ├── bfo-alignment.md                 # BFO/IAO grounding & class/property anchors
-│   ├── design-decisions.md              # TBox decisions, naming, annotation patterns
-│   ├── evaluation-plan.md               # CQs, integrity checks, regression outline
-│   └── competency-questions.md          # CQ1–CQ3 & sample SPARQL
+│ ├── bfo-alignment.md            # mapping OntoMI ↔ BFO/IAO (classes & properties)
+│ ├── design-decisions.md         # rationale for modeling choices
+│ ├── cq-guide.md                 # CQ1–CQ3 queries + how to run them
+│ ├── evaluation-plan.md          # metrics, datasets, acceptance criteria
+│ └── sabiox-readme.md            # sabiox documentation
+├── evaluation/
+│ ├── cq/
+│ │ ├── cq1.rq                    # “which intelligences are evoked in a fragment?”
+│ │ ├── cq2.rq                    # “which elements contributed to each evocation?”
+│ │ └── cq3.rq                    # “which intelligence is most intense (primary)?”
+│ ├── consistency/
+│ │ └── integrity-queries.rq      # domain/range/functional/disjointness checks
+│ └── tests/
+│ └── regression.md               # how to run repeatable checks per release
 ├── examples/
-│   ├── instances/                       # Canonical ABox examples
-│   └── queries/                         # SPARQL: CQs & integrity checks
+│ ├── instances.ttl               # canonical instances (e.g., Newton’s First Law example)
+│ └── shapes/                     # optional SHACL/SHEXC shapes (if adopted)
+├── datasets/
+│ └── demo/                       # small corpora for demonstration & evaluation
 ├── citations/
-│   └── references.bib                   # BFO/IAO/101/SABiOx & related works
-└── releases/
-    ├── CHANGELOG.md
-    └── RELEASE-NOTES-v1.1.0.md
+│ └── references.bib              # BibTeX (BFO/IAO/101/SABiOx/etc.)
+└── README.md                     # short project overview for newcomers
 ```
 
 ---
@@ -78,7 +98,7 @@ The ontology, rationale, and evaluation (competency questions, instances, and qu
 ## Quick start
 
 1. **Open in Protégé**  
-   Load `ontology/OntoMI_unificada_bfo.ttl`. Verify consistency with HermiT/ELK.
+   Load `ontology/src/OntoMI.ttl`. Verify consistency with HermiT/ELK.
 
 2. **Explore core CQs**  
    See `docs/competency-questions.md` and run queries from `examples/queries/`.

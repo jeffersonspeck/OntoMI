@@ -1,0 +1,592 @@
+@prefix bfo:  <http://purl.obolibrary.org/obo/BFO_> .
+@prefix iao:  <http://purl.obolibrary.org/obo/IAO_> .
+@prefix onto: <https://w3id.org/ontomi#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+
+#################################################################
+# Ontology header / metadados
+#################################################################
+<https://w3id.org/ontomi>
+  a owl:Ontology ;
+  owl:versionIRI <https://w3id.org/ontomi/2025-10> ;
+  dct:title "OntoMI: Ontology for Multiple Intelligences in Educational Texts"@en ,
+            "OntoMI: Ontologia para Inteligências Múltiplas em Textos Educacionais"@pt ;
+  dct:creator "Jefferson Rodrigo Speck" ;
+  dct:created "2025-10-26"^^xsd:date ;
+  dct:modified "2025-10-26"^^xsd:date ;
+  dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+  vann:preferredNamespacePrefix "onto" ;
+  vann:preferredNamespaceUri "https://w3id.org/ontomi#" ;
+  rdfs:comment "Núcleo alinhado a BFO (Disposition/Process) e IAO (ICE/is about). Validação por SHACL. Perfil sugerido: OWL 2 EL + SHACL."@pt .
+
+#################################################################
+# Rótulos de topo (BFO/IAO) — coerência de prefixos
+#################################################################
+bfo:0000015 rdfs:label "Process"@en .
+bfo:0000016 rdfs:label "Disposition"@en .
+iao:0000030 rdfs:label "Information content entity"@en .
+iao:0000136 rdfs:label "is about"@en .
+
+#################################################################
+# Núcleo OntoMI (classes) — labels & comments pt/en
+#################################################################
+
+onto:Intelligence a owl:Class ;
+  rdfs:label "Intelligence"@en , "Inteligência"@pt ;
+  rdfs:comment "Stable cognitive category in Gardner's Theory of Multiple Intelligences; modeled as a BFO disposition."@en ,
+               "Categoria cognitiva estável segundo a Teoria das Inteligências Múltiplas de Gardner; modelada como uma disposição no BFO."@pt ;
+  rdfs:subClassOf bfo:0000016 .
+
+onto:IntelligenceDisposition a owl:Class ;
+  rdfs:label "Intelligence Disposition"@en , "Disposição de inteligência"@pt ;
+  rdfs:comment "Type of realizable cognitive disposition aligned with Gardner's MI; realizable entity in the BFO sense."@en ,
+               "Tipo de disposição cognitiva realizável alinhada à TIM de Gardner; entidade realizável no sentido do BFO."@pt ;
+  rdfs:subClassOf bfo:0000016 .
+
+# Específicas (TIM)
+onto:LinguisticIntelligence a owl:Class ;
+  rdfs:label "Linguistic"@en , "Linguística"@pt ;
+  rdfs:comment "Disposition related to sensitivity to language, word choice, and verbal reasoning."@en ,
+               "Disposição relacionada à sensibilidade à linguagem, escolha de palavras e raciocínio verbal."@pt ;
+  rdfs:subClassOf onto:IntelligenceDisposition .
+
+onto:LogicalMathematicalIntelligence a owl:Class ;
+  rdfs:label "Logical-Mathematical"@en , "Lógico-matemática"@pt ;
+  rdfs:comment "Disposition related to formal reasoning, logic, numbers, and abstract relations."@en ,
+               "Disposição relacionada ao raciocínio formal, lógica, números e relações abstratas."@pt ;
+  rdfs:subClassOf onto:IntelligenceDisposition .
+
+onto:SpatialIntelligence a owl:Class ;
+  rdfs:label "Spatial"@en , "Espacial-visual"@pt ;
+  rdfs:comment "Disposition related to mental imagery, spatial reasoning, and visual pattern handling."@en ,
+               "Disposição relacionada à imagética mental, raciocínio espacial e manipulação de padrões visuais."@pt ;
+  rdfs:subClassOf onto:IntelligenceDisposition .
+
+onto:BodilyKinestheticIntelligence a owl:Class ;
+  rdfs:label "Bodily-Kinesthetic"@en , "Cinestésico-corporal"@pt ;
+  rdfs:comment "Disposition related to motor control, tactile/kinesthetic learning, and embodied performance."@en ,
+               "Disposição relacionada ao controle motor, aprendizagem tátil/cinestésica e performance corporal."@pt ;
+  rdfs:subClassOf onto:IntelligenceDisposition .
+
+onto:MusicalIntelligence a owl:Class ;
+  rdfs:label "Musical"@en , "Musical"@pt ;
+  rdfs:comment "Disposition related to rhythm, melody, harmony, and auditory pattern recognition."@en ,
+               "Disposição relacionada a ritmo, melodia, harmonia e reconhecimento de padrões auditivos."@pt ;
+  rdfs:subClassOf onto:IntelligenceDisposition .
+
+onto:InterpersonalIntelligence a owl:Class ;
+  rdfs:label "Interpersonal"@en , "Interpessoal"@pt ;
+  rdfs:comment "Disposition related to understanding others' intentions, emotions, and social cues."@en ,
+               "Disposição relacionada à compreensão de intenções, emoções e sinais sociais de outras pessoas."@pt ;
+  rdfs:subClassOf onto:IntelligenceDisposition .
+
+onto:IntrapersonalIntelligence a owl:Class ;
+  rdfs:label "Intrapersonal"@en , "Intrapessoal"@pt ;
+  rdfs:comment "Disposition related to self-knowledge, introspection, and regulation of one's own emotions."@en ,
+               "Disposição relacionada ao autoconhecimento, introspecção e regulação das próprias emoções."@pt ;
+  rdfs:subClassOf onto:IntelligenceDisposition .
+
+onto:NaturalistIntelligence a owl:Class ;
+  rdfs:label "Naturalist"@en , "Naturalista"@pt ;
+  rdfs:comment "Disposition related to recognizing and classifying patterns in nature and the environment."@en ,
+               "Disposição relacionada ao reconhecimento e classificação de padrões na natureza e no ambiente."@pt ;
+  rdfs:subClassOf onto:IntelligenceDisposition .
+
+# ICEs (IAO)
+onto:ExplanationElement a owl:Class ;
+  rdfs:label "Explanation Element"@en , "Elemento explicativo"@pt ;
+  rdfs:comment "Abstract container for elements that help evoke intelligences (e.g., Keyword, ContextObject, DiscursiveStrategy)."@en ,
+               "Container abstrato para elementos que ajudam a evocar inteligências (ex.: Palavra-chave, Objeto de contexto, Estratégia discursiva)."@pt ;
+  rdfs:subClassOf iao:0000030 .
+
+onto:Keyword a owl:Class ;
+  rdfs:label "Keyword"@en , "Palavra-chave"@pt ;
+  rdfs:comment "Salient lexical item used as evidence in evocation analysis."@en ,
+               "Item lexical saliente usado como evidência na análise de evocação."@pt ;
+  rdfs:subClassOf onto:ExplanationElement .
+
+onto:ContextObject a owl:Class ;
+  rdfs:label "Context Object"@en , "Objeto de contexto"@pt ;
+  rdfs:comment "Physical/symbolic/situational object mentioned in the fragment that the content may be about."@en ,
+               "Objeto físico/simbólico/situacional mencionado no fragmento sobre o qual o conteúdo pode ser."@pt ;
+  rdfs:subClassOf onto:ExplanationElement .
+
+onto:DiscursiveStrategy a owl:Class ;
+  rdfs:label "Discursive Strategy"@en , "Estratégia discursiva"@pt ;
+  rdfs:comment "Rhetorical-pedagogical form (e.g., analogy, dramatization, simulation) used in the explanation."@en ,
+               "Forma retórico-pedagógica (ex.: analogia, dramatização, simulação) utilizada na explicação."@pt ;
+  rdfs:subClassOf onto:ExplanationElement .
+
+onto:ExplanationFragment a owl:Class ;
+  rdfs:label "Explanation Fragment"@en , "Fragmento explicativo"@pt ;
+  rdfs:comment "Textual unit of analysis (ICE) serving as the basis for heuristic inference."@en ,
+               "Unidade textual de análise (ICE) que serve de base para a inferência heurística."@pt ;
+  rdfs:subClassOf iao:0000030 .
+
+onto:IntelligenceActivation a owl:Class ;
+  rdfs:label "Intelligence Activation"@en , "Ativação de inteligência"@pt ;
+  rdfs:comment "Reified assertion (ICE) representing an inferred activation of an intelligence within a fragment."@en ,
+               "Asserção reificada (ICE) que representa a ativação inferida de uma inteligência em um fragmento."@pt ;
+  rdfs:subClassOf iao:0000030 .
+
+onto:EvocationProcess a owl:Class ;
+  rdfs:label "Evocation Process"@en , "Processo de evocação"@pt ;
+  rdfs:comment "Cognitive/interpretive event (occurrent) that can realize an intelligence disposition."@en ,
+               "Evento cognitivo/interpretativo (ocorrente) que pode realizar uma disposição de inteligência."@pt ;
+  rdfs:subClassOf bfo:0000015 .
+
+onto:MIProfileVector a owl:Class ;
+  rdfs:label "MI Profile Vector"@en , "Vetor de perfil MI"@pt ;
+  rdfs:comment "Informational representation (ICE) of aggregated activations across intelligences, as an 8D percentage vector."@en ,
+               "Representação informacional (ICE) das ativações agregadas entre as inteligências, como vetor percentual 8D."@pt ;
+  rdfs:subClassOf iao:0000030 .
+
+# Vocabulário de tipo de ativação
+onto:ActivationType a owl:Class ;
+  rdfs:label "Activation Type"@en , "Tipo de ativação"@pt ;
+  rdfs:comment "Controlled vocabulary to qualify activation salience (primary/secondary)."@en ,
+               "Vocabulário controlado para qualificar a saliência da ativação (primária/secundária)."@pt .
+
+onto:Primary a owl:NamedIndividual , onto:ActivationType ;
+  rdfs:label "primary"@en , "primária"@pt .
+
+onto:Secondary a owl:NamedIndividual , onto:ActivationType ;
+  rdfs:label "secondary"@en , "secundária"@pt .
+
+onto:hasActivationType a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "hasActivationType"@en , "temTipoDeAtivação"@pt ;
+  rdfs:domain onto:IntelligenceActivation ;
+  rdfs:range  onto:ActivationType .
+
+#################################################################
+# Propriedades (subpropriedades de iao:is about quando semânticas)
+#################################################################
+onto:usesElement a owl:ObjectProperty ;
+  rdfs:label "usesElement"@en , "usaElemento"@pt ;
+  rdfs:domain onto:ExplanationFragment ;
+  rdfs:range  onto:ExplanationElement ;
+  rdfs:subPropertyOf iao:0000136 .
+
+onto:evokesIntelligence a owl:ObjectProperty ;
+  rdfs:label "evokesIntelligence"@en , "evocaInteligência"@pt ;
+  rdfs:domain onto:ExplanationElement ;
+  rdfs:range  onto:IntelligenceDisposition ;
+  rdfs:subPropertyOf iao:0000136 .
+
+onto:isAboutFragment a owl:ObjectProperty ;
+  rdfs:label "isAboutFragment"@en , "éSobreFragmento"@pt ;
+  rdfs:domain onto:IntelligenceActivation ;
+  rdfs:range  onto:ExplanationFragment ;
+  rdfs:subPropertyOf iao:0000136 .
+
+# Ligação principal via topo:
+#   IntelligenceActivation -- iao:is about --> IntelligenceDisposition
+# Ex.: _:act iao:0000136 onto:LinguisticIntelligence .
+
+onto:hasActivation a owl:ObjectProperty ;
+  rdfs:label "hasActivation"@en , "temAtivação"@pt ;
+  rdfs:comment "Links a fragment to a reified activation assertion."@en ,
+               "Liga um fragmento a uma asserção reificada de ativação."@pt ;
+  rdfs:domain onto:ExplanationFragment ;
+  rdfs:range  onto:IntelligenceActivation .
+
+onto:hasPrimaryActivation a owl:ObjectProperty , owl:FunctionalProperty ;
+  rdfs:label "hasPrimaryActivation"@en , "temAtivaçãoPrimária"@pt ;
+  rdfs:domain onto:ExplanationFragment ;
+  rdfs:range  onto:IntelligenceActivation ;
+  rdfs:subPropertyOf onto:hasActivation .
+
+onto:hasSecondaryActivation a owl:ObjectProperty ;
+  rdfs:label "hasSecondaryActivation"@en , "temAtivaçãoSecundária"@pt ;
+  rdfs:domain onto:ExplanationFragment ;
+  rdfs:range  onto:IntelligenceActivation ;
+  rdfs:subPropertyOf onto:hasActivation .
+
+onto:denotesProcess a owl:ObjectProperty ;
+  rdfs:label "denotesProcess"@en , "denotaProcesso"@pt ;
+  rdfs:domain onto:IntelligenceActivation ;
+  rdfs:range  onto:EvocationProcess .
+
+onto:hasActivationScore a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "activation score"@en , "escore de ativação"@pt ;
+  iao:0000115 "Intensidade da ativação inferida para uma instância de IntelligenceActivation (0..1, 0..100 ou escala definida pela aplicação)."@pt ;
+  rdfs:domain onto:IntelligenceActivation ;
+  rdfs:range  xsd:decimal .
+
+onto:hasWeight a owl:DatatypeProperty ;
+  rdfs:label "hasWeight"@en , "temPeso"@pt ;
+  rdfs:domain onto:IntelligenceActivation ;
+  rdfs:range  xsd:decimal .
+
+onto:miVector a owl:DatatypeProperty , owl:FunctionalProperty ;
+  rdfs:label "MI percentage vector (8D)"@en , "Vetor percentual de IM (8D)"@pt ;
+  iao:0000115 "Resultado agregado das ativações por inteligência, representado como string com 8 valores percentuais, em ordem fixa: [Linguistic, Logical-Mathematical, Spatial-Visual, Bodily-Kinesthetic, Musical, Interpersonal, Intrapersonal, Naturalist]."@pt ;
+  iao:0000116 "Derivado dos escores em onto:hasActivationScore das ativações reificadas associadas; consumidores podem calcular sob demanda."@pt ;
+  rdfs:domain onto:MIProfileVector ;
+  rdfs:range  xsd:string .
+
+#################################################################
+# Axiomas auxiliares
+#################################################################
+[] a owl:Axiom ;
+   owl:annotatedSource  onto:hasPrimaryActivation ;
+   owl:annotatedProperty rdfs:comment ;
+   owl:annotatedTarget "Convenção: toda ativação ligada por hasPrimaryActivation deve ter hasActivationType onto:Primary."@pt .
+
+[] a owl:AllDisjointClasses ;
+   owl:members ( onto:Keyword onto:ContextObject onto:DiscursiveStrategy ) .
+
+#################################################################
+# SHACL (regras de validação de instâncias)
+#################################################################
+# 1) Não instanciar ExplanationElement diretamente
+onto:ExplanationElementAdvisoryShape a sh:NodeShape ;
+  sh:targetClass onto:ExplanationElement ;
+  sh:closed true ;
+  sh:message "Instanciação direta de ExplanationElement não recomendada; use Keyword, ContextObject ou DiscursiveStrategy."@pt .
+
+# 2) ExplanationFragment precisa de usesElement OU hasActivation
+onto:ExplanationFragmentShape a sh:NodeShape ;
+  sh:targetClass onto:ExplanationFragment ;
+  sh:message "ExplanationFragment deve possuir pelo menos uma ligação semântica (usesElement) ou uma ativação (hasActivation)."@pt ;
+  sh:or (
+    [ sh:property [ sh:path onto:usesElement   ; sh:minCount 1 ] ]
+    [ sh:property [ sh:path onto:hasActivation ; sh:minCount 1 ] ]
+  ) .
+
+# 3) IntelligenceActivation deve:
+#    a) 'is about' (iao:0000136) alguma IntelligenceDisposition
+#    b) possuir hasActivationType em {Primary, Secondary}
+onto:IntelligenceActivationShape a sh:NodeShape ;
+  sh:targetClass onto:IntelligenceActivation ;
+  sh:property [
+    sh:path iao:0000136 ;
+    sh:minCount 1 ;
+    sh:class onto:IntelligenceDisposition ;
+    sh:message "IntelligenceActivation deve apontar para uma IntelligenceDisposition via iao:is about."@pt
+  ] ;
+  sh:property [
+    sh:path onto:hasActivationType ;
+    sh:in ( onto:Primary onto:Secondary ) ;
+    sh:minCount 1 ;
+    sh:message "IntelligenceActivation deve possuir um tipo válido (primária/secundária)."@pt
+  ] .
+
+#################################################################
+# ABox — instâncias do caso "A inércia em movimento"
+#################################################################
+
+### Fragmento analisado
+onto:frag_inercia_001 a onto:ExplanationFragment ;
+  rdfs:label "A inércia em movimento: o corpo como experimento (fragmento)"@pt , "Inertia in motion: the body as experiment (fragment)"@en ;
+  rdfs:comment "Fragmento com atividade corporal em duplas e ritual sonoro para compreender a Lei da Inércia."@pt ;
+  # Vínculos com todos os elementos listados nas tabelas
+  onto:usesElement
+    ## Keywords
+    onto:keyword_inercia ,
+    onto:keyword_primeira_lei_de_newton ,
+    onto:keyword_atividade_corporal ,
+    onto:keyword_duplas ,
+    onto:keyword_empurrar ,
+    onto:keyword_observar ,
+    onto:keyword_movimento_retilineo_uniforme ,
+    onto:keyword_atrito ,
+    onto:keyword_parede ,
+    onto:keyword_som ,
+    onto:keyword_palmas ,
+    onto:keyword_batidas_leves ,
+    onto:keyword_pisadas_cadenciadas ,
+    onto:keyword_sequencia_sonora ,
+    onto:keyword_interferencia_externa ,
+    onto:keyword_vivencias ,
+    onto:keyword_compreender ,
+    onto:keyword_manter_o_estado ,
+    onto:keyword_ritmo ,
+    onto:keyword_interpretar ,
+    onto:keyword_interacao ,
+    onto:keyword_discussao ,
+    onto:keyword_experiencia ,
+    ## ContextObjects
+    onto:context_plataforma ,
+    onto:context_sala_de_aula ,
+    onto:context_atividade_ritual ,
+    onto:context_encenacao ,
+    onto:context_ambiente_silencio ,
+    onto:context_trajetoria ,
+    onto:context_conceito_fisico ,
+    onto:context_momento_reflexao ,
+    ## DiscursiveStrategies
+    onto:strategy_dramatizacao_corporal ,
+    onto:strategy_simulacao_experimental ,
+    onto:strategy_ritual_sonoro ,
+    onto:strategy_exemplo_conceitual ,
+    onto:strategy_discussao_em_grupo ;
+  # Ativações conforme totalizador: Primária = Cinestésico; Secundária = Interpessoal (+ Lógico-matemática)
+  onto:hasPrimaryActivation   onto:act_primary_cinestesico_001 ;
+  onto:hasSecondaryActivation onto:act_secondary_interpessoal_001 ,
+                              onto:act_secondary_logico_001 .
+
+#################################################################
+# Inteligências (indivíduos alvo das ativações)
+# (tipadas explicitamente como Intell.Disposition para facilitar SHACL sem inferência)
+#################################################################
+onto:intel_Linguistic          a onto:IntelligenceDisposition , onto:LinguisticIntelligence ;
+  rdfs:label "Linguística (instância)"@pt , "Linguistic (instance)"@en .
+onto:intel_LogicalMathematical a onto:IntelligenceDisposition , onto:LogicalMathematicalIntelligence ;
+  rdfs:label "Lógico-matemática (instância)"@pt , "Logical-Mathematical (instance)"@en .
+onto:intel_Spatial             a onto:IntelligenceDisposition , onto:SpatialIntelligence ;
+  rdfs:label "Espacial-visual (instância)"@pt , "Spatial-Visual (instance)"@en .
+onto:intel_BodilyKinesthetic   a onto:IntelligenceDisposition , onto:BodilyKinestheticIntelligence ;
+  rdfs:label "Cinestésico-corporal (instância)"@pt , "Bodily-Kinesthetic (instance)"@en .
+onto:intel_Musical             a onto:IntelligenceDisposition , onto:MusicalIntelligence ;
+  rdfs:label "Musical (instância)"@pt , "Musical (instance)"@en .
+onto:intel_Interpersonal       a onto:IntelligenceDisposition , onto:InterpersonalIntelligence ;
+  rdfs:label "Interpessoal (instância)"@pt , "Interpersonal (instance)"@en .
+onto:intel_Intrapersonal       a onto:IntelligenceDisposition , onto:IntrapersonalIntelligence ;
+  rdfs:label "Intrapessoal (instância)"@pt , "Intrapersonal (instance)"@en .
+onto:intel_Naturalist          a onto:IntelligenceDisposition , onto:NaturalistIntelligence ;
+  rdfs:label "Naturalista (instância)"@pt , "Naturalist (instance)"@en .
+
+#################################################################
+# Keywords — exatamente conforme a tabela
+#################################################################
+onto:keyword_inercia a onto:Keyword ;
+  rdfs:label "inércia"@pt ;
+  dct:type "conceito físico"@pt ;
+  onto:evokesIntelligence onto:intel_LogicalMathematical , onto:intel_BodilyKinesthetic .
+
+onto:keyword_primeira_lei_de_newton a onto:Keyword ;
+  rdfs:label "Primeira Lei de Newton"@pt ;
+  dct:type "conceito teórico"@pt ;
+  onto:evokesIntelligence onto:intel_LogicalMathematical .
+
+onto:keyword_atividade_corporal a onto:Keyword ;
+  rdfs:label "atividade corporal"@pt ;
+  dct:type "ação composta"@pt ;
+  onto:evokesIntelligence onto:intel_BodilyKinesthetic .
+
+onto:keyword_duplas a onto:Keyword ;
+  rdfs:label "duplas"@pt ;
+  dct:type "estrutura social"@pt ;
+  onto:evokesIntelligence onto:intel_Interpersonal .
+
+onto:keyword_empurrar a onto:Keyword ;
+  rdfs:label "empurrar"@pt ;
+  dct:type "verbo de ação"@pt ;
+  onto:evokesIntelligence onto:intel_BodilyKinesthetic .
+
+onto:keyword_observar a onto:Keyword ;
+  rdfs:label "observar"@pt ;
+  dct:type "verbo perceptivo"@pt ;
+  onto:evokesIntelligence onto:intel_Spatial .
+
+onto:keyword_movimento_retilineo_uniforme a onto:Keyword ;
+  rdfs:label "movimento retilíneo uniforme"@pt ;
+  dct:type "conceito científico"@pt ;
+  onto:evokesIntelligence onto:intel_LogicalMathematical , onto:intel_BodilyKinesthetic .
+
+onto:keyword_atrito a onto:Keyword ;
+  rdfs:label "atrito"@pt ;
+  dct:type "conceito físico"@pt ;
+  onto:evokesIntelligence onto:intel_LogicalMathematical .
+
+onto:keyword_parede a onto:Keyword ;
+  rdfs:label "parede"@pt ;
+  dct:type "objeto estático"@pt ;
+  onto:evokesIntelligence onto:intel_Spatial .
+
+onto:keyword_som a onto:Keyword ;
+  rdfs:label "som"@pt ;
+  dct:type "percepção sensorial"@pt ;
+  onto:evokesIntelligence onto:intel_Musical .
+
+onto:keyword_palmas a onto:Keyword ;
+  rdfs:label "palmas"@pt ;
+  dct:type "ação sonora corporal"@pt ;
+  onto:evokesIntelligence onto:intel_Musical , onto:intel_BodilyKinesthetic .
+
+onto:keyword_batidas_leves a onto:Keyword ;
+  rdfs:label "batidas leves"@pt ;
+  dct:type "ação sonora corporal"@pt ;
+  onto:evokesIntelligence onto:intel_Musical , onto:intel_BodilyKinesthetic .
+
+onto:keyword_pisadas_cadenciadas a onto:Keyword ;
+  rdfs:label "pisadas cadenciadas"@pt ;
+  dct:type "ação sonora corporal"@pt ;
+  onto:evokesIntelligence onto:intel_Musical , onto:intel_BodilyKinesthetic .
+
+onto:keyword_sequencia_sonora a onto:Keyword ;
+  rdfs:label "sequência sonora"@pt ;
+  dct:type "estrutura musical"@pt ;
+  onto:evokesIntelligence onto:intel_Musical .
+
+onto:keyword_interferencia_externa a onto:Keyword ;
+  rdfs:label "interferência externa"@pt ;
+  dct:type "conceito relacional"@pt ;
+  onto:evokesIntelligence onto:intel_LogicalMathematical .
+
+onto:keyword_vivencias a onto:Keyword ;
+  rdfs:label "vivências"@pt ;
+  dct:type "termo experiencial"@pt ;
+  onto:evokesIntelligence onto:intel_Intrapersonal , onto:intel_BodilyKinesthetic .
+
+onto:keyword_compreender a onto:Keyword ;
+  rdfs:label "compreender"@pt ;
+  dct:type "verbo cognitivo"@pt ;
+  onto:evokesIntelligence onto:intel_Linguistic , onto:intel_Intrapersonal .
+
+onto:keyword_manter_o_estado a onto:Keyword ;
+  rdfs:label "manter o estado"@pt ;
+  dct:type "conceito físico"@pt ;
+  onto:evokesIntelligence onto:intel_LogicalMathematical , onto:intel_BodilyKinesthetic .
+
+onto:keyword_ritmo a onto:Keyword ;
+  rdfs:label "ritmo"@pt ;
+  dct:type "padrão temporal"@pt ;
+  onto:evokesIntelligence onto:intel_Musical .
+
+onto:keyword_interpretar a onto:Keyword ;
+  rdfs:label "interpretar"@pt ;
+  dct:type "verbo cognitivo"@pt ;
+  onto:evokesIntelligence onto:intel_Linguistic , onto:intel_Intrapersonal .
+
+onto:keyword_interacao a onto:Keyword ;
+  rdfs:label "interação"@pt ;
+  dct:type "ação social"@pt ;
+  onto:evokesIntelligence onto:intel_Interpersonal .
+
+onto:keyword_discussao a onto:Keyword ;
+  rdfs:label "discussão"@pt ;
+  dct:type "ação coletiva"@pt ;
+  onto:evokesIntelligence onto:intel_Interpersonal , onto:intel_Linguistic .
+
+onto:keyword_experiencia a onto:Keyword ;
+  rdfs:label "experiência"@pt ;
+  dct:type "conceito abstrato"@pt ;
+  onto:evokesIntelligence onto:intel_Intrapersonal , onto:intel_BodilyKinesthetic .
+
+#################################################################
+# ContextObjects — exatamente conforme a tabela
+#################################################################
+onto:context_plataforma a onto:ContextObject ;
+  rdfs:label "plataforma de rodinhas"@pt ;
+  dct:type "físico"@pt ;
+  onto:evokesIntelligence onto:intel_BodilyKinesthetic .
+
+onto:context_sala_de_aula a onto:ContextObject ;
+  rdfs:label "sala de aula organizada em duplas"@pt ;
+  dct:type "situacional"@pt ;
+  onto:evokesIntelligence onto:intel_Interpersonal .
+
+onto:context_atividade_ritual a onto:ContextObject ;
+  rdfs:label "ritual de movimento"@pt ;
+  dct:type "simbólico/cultural"@pt ;
+  onto:evokesIntelligence onto:intel_Musical , onto:intel_BodilyKinesthetic .
+
+onto:context_encenacao a onto:ContextObject ;
+  rdfs:label "encenação do experimento"@pt ;
+  dct:type "simbólico/performático"@pt ;
+  onto:evokesIntelligence onto:intel_BodilyKinesthetic , onto:intel_Interpersonal .
+
+onto:context_ambiente_silencio a onto:ContextObject ;
+  rdfs:label "ambiente silencioso com som cadenciado"@pt ;
+  dct:type "situacional/acústico"@pt ;
+  onto:evokesIntelligence onto:intel_Musical .
+
+onto:context_trajetoria a onto:ContextObject ;
+  rdfs:label "deslocamento linear no espaço"@pt ;
+  dct:type "espacial"@pt ;
+  onto:evokesIntelligence onto:intel_Spatial , onto:intel_BodilyKinesthetic .
+
+onto:context_conceito_fisico a onto:ContextObject ;
+  rdfs:label "conceito de força externa e atrito"@pt ;
+  dct:type "abstrato/conceitual"@pt ;
+  onto:evokesIntelligence onto:intel_LogicalMathematical .
+
+onto:context_momento_reflexao a onto:ContextObject ;
+  rdfs:label "discussão final da experiência"@pt ;
+  dct:type "social/interpretativo"@pt ;
+  onto:evokesIntelligence onto:intel_Intrapersonal , onto:intel_Interpersonal .
+
+#################################################################
+# DiscursiveStrategies — exatamente conforme a tabela
+#################################################################
+onto:strategy_dramatizacao_corporal a onto:DiscursiveStrategy ;
+  rdfs:label "dramatização corporal em duplas"@pt ;
+  dct:type "encenação / performance"@pt ;
+  onto:evokesIntelligence onto:intel_BodilyKinesthetic , onto:intel_Interpersonal .
+
+onto:strategy_simulacao_experimental a onto:DiscursiveStrategy ;
+  rdfs:label "simulação de experimento físico"@pt ;
+  dct:type "simulação demonstrativa"@pt ;
+  onto:evokesIntelligence onto:intel_BodilyKinesthetic , onto:intel_LogicalMathematical .
+
+onto:strategy_ritual_sonoro a onto:DiscursiveStrategy ;
+  rdfs:label "ritual sonoro com palmas e batidas"@pt ;
+  dct:type "representação sonora"@pt ;
+  onto:evokesIntelligence onto:intel_Musical , onto:intel_BodilyKinesthetic .
+
+onto:strategy_exemplo_conceitual a onto:DiscursiveStrategy ;
+  rdfs:label "exemplo conceitual da força externa"@pt ;
+  dct:type "exemplo teórico"@pt ;
+  onto:evokesIntelligence onto:intel_LogicalMathematical .
+
+onto:strategy_discussao_em_grupo a onto:DiscursiveStrategy ;
+  rdfs:label "discussão em grupo"@pt ;
+  dct:type "interpretação coletiva"@pt ;
+  onto:evokesIntelligence onto:intel_Interpersonal , onto:intel_Intrapersonal .
+
+#################################################################
+# Processo de evocação (opcional)
+#################################################################
+onto:evocation_001 a onto:EvocationProcess ;
+  rdfs:label "Evocação — atividade corporal e ritual sonoro"@pt .
+
+#################################################################
+# Ativações (reificadas) — compatíveis com SHACL
+#################################################################
+# Primária — Cinestésico-corporal
+onto:act_primary_cinestesico_001 a onto:IntelligenceActivation ;
+  rdfs:label "Ativação primária — Cinestésico-corporal"@pt ;
+  iao:0000136 onto:intel_BodilyKinesthetic ;
+  onto:isAboutFragment onto:frag_inercia_001 ;
+  onto:hasActivationType onto:Primary ;
+  onto:hasActivationScore "0.85"^^xsd:decimal ;
+  onto:denotesProcess onto:evocation_001 .
+
+# Secundária — Interpessoal
+onto:act_secondary_interpessoal_001 a onto:IntelligenceActivation ;
+  rdfs:label "Ativação secundária — Interpessoal"@pt ;
+  iao:0000136 onto:intel_Interpersonal ;
+  onto:isAboutFragment onto:frag_inercia_001 ;
+  onto:hasActivationType onto:Secondary ;
+  onto:hasActivationScore "0.65"^^xsd:decimal ;
+  onto:denotesProcess onto:evocation_001 .
+
+# Secundária — Lógico-matemática
+onto:act_secondary_logico_001 a onto:IntelligenceActivation ;
+  rdfs:label "Ativação secundária — Lógico-matemática"@pt ;
+  iao:0000136 onto:intel_LogicalMathematical ;
+  onto:isAboutFragment onto:frag_inercia_001 ;
+  onto:hasActivationType onto:Secondary ;
+  onto:hasActivationScore "0.60"^^xsd:decimal ;
+  onto:denotesProcess onto:evocation_001 .
+
+# (opcional) Referência redundante das ativações ao fragmento
+onto:frag_inercia_001
+  onto:hasActivation onto:act_secondary_interpessoal_001 ,
+                     onto:act_secondary_logico_001 .
+
+#################################################################
+# Vetor MI agregado (percentual na ordem 8D: L, LM, SV, BK, M, IP, IA, N)
+# Valores calculados a partir do totalizador que você forneceu
+#################################################################
+onto:mivector_inercia_001 a onto:MIProfileVector ;
+  rdfs:label "Vetor MI — Inércia em movimento (normalizado)"@pt ;
+  onto:miVector "3.23, 17.20, 4.30, 31.18, 15.05, 19.35, 9.68, 0.00" .
