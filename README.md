@@ -1,4 +1,7 @@
-# OntoMI — An Ontology for Multiple Intelligences in Explanatory Texts
+# OntoMI — An Ontology for Multiple Intelligences in Texts
+[![versão](https://img.shields.io/badge/vers%C3%A3o-1.1.0-blue?style=flat-square)](#)
+[![formato](https://img.shields.io/badge/formato-OWL%20%2F%20TTL-0B7285?style=flat-square)](https://www.w3.org/TR/owl2-overview/)
+[![base](https://img.shields.io/badge/base-BFO%20%2B%20OBO-6C757D?style=flat-square)](https://obofoundry.org/)
 
 **OntoMI** is a domain ontology (OWL 2, Turtle) developed in a Master’s dissertation to represent how explanatory fragments of educational texts evoke **Multiple Intelligences (MI)**.  
 The project began as a prototypical artifact built with **Ontology Development 101** and was **evolved under SABiOx** to a mature, documented, and interoperable ontology **grounded on BFO 2020** and **IAO (OBO Foundry)**.
