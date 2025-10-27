@@ -8,15 +8,15 @@ The project began as a prototypical artifact built with **Ontology Development 1
 ## What is OntoMI?
 
 OntoMI models:
-- **ExplanationFragment** — the textual unit of analysis (sentence/paragraph).
+- **ExplanationFragment**: the textual unit of analysis (sentence/paragraph).
 - **ExplanationElement** *(abstract)* with three specializations used as evidence:
   - **Keyword**, **ContextObject**, **DiscursiveStrategy**.
-- **Intelligence** — the MI categories.
-- **IntelligenceActivation** — the reified activation event inferred for a fragment.
+- **Intelligence**: the MI categories.
+- **IntelligenceActivation**: the reified activation event inferred for a fragment.
 
 The ABox may store **per-intelligence scores** and a derived **MI vector**:
-- `onto:hasActivationScore` (functional) — score per intelligence activation.
-- `onto:miVector` — 8-position vector (percentages), derived from scores.
+- `onto:hasActivationScore`: (functional) score per intelligence activation.
+- `onto:miVector`: 8-position vector (percentages), derived from scores.
 
 ---
 
@@ -135,7 +135,7 @@ If you use OntoMI, please cite the repository and the preferred paper.
   Repository: https://github.com/jeffersonspeck/OntoMI
 
 **Preferred citation:**
-- Specl, Jefferson Rodrigo. *OntoMI: A Ontology for Multiple Intelligences. 2025*.
+- Speck, Jefferson Rodrigo. *OntoMI: A Ontology for Multiple Intelligences. 2025*.
 
 > We maintain a machine-readable citation file: [`CITATION.cff`](./CITATION.cff).
 
