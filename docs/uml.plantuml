@@ -1,0 +1,114 @@
+@startuml
+title OntoMI — UML de Classes (derivado do TTL)
+
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+
+note as N0
+Ontology IRI: https://w3id.org/ontomi
+Version IRI:  https://w3id.org/ontomi/2025-10
+Perfil: OWL 2 EL + SHACL
+end note
+
+package "Upper Ontologies (BFO/IAO)" {
+  class "BFO::Process" as BFO_Process <<BFO>> {}
+  class "BFO::Disposition" as BFO_Disposition <<BFO>> {}
+  class "IAO::InformationContentEntity" as IAO_ICE <<IAO>> {}
+}
+
+package "OntoMI Core" {
+  abstract class Intelligence <<BFO::Disposition>> {}
+  class IntelligenceDisposition <<BFO::Disposition>> {}
+  Intelligence --|> BFO_Disposition
+  IntelligenceDisposition --|> BFO_Disposition
+
+  class LinguisticIntelligence
+  class LogicalMathematicalIntelligence
+  class SpatialIntelligence
+  class BodilyKinestheticIntelligence
+  class MusicalIntelligence
+  class InterpersonalIntelligence
+  class IntrapersonalIntelligence
+  class NaturalistIntelligence
+
+  LinguisticIntelligence --|> IntelligenceDisposition
+  LogicalMathematicalIntelligence --|> IntelligenceDisposition
+  SpatialIntelligence --|> IntelligenceDisposition
+  BodilyKinestheticIntelligence --|> IntelligenceDisposition
+  MusicalIntelligence --|> IntelligenceDisposition
+  InterpersonalIntelligence --|> IntelligenceDisposition
+  IntrapersonalIntelligence --|> IntelligenceDisposition
+  NaturalistIntelligence --|> IntelligenceDisposition
+
+  class ExplanationElement <<IAO::ICE>> {}
+  class Keyword <<IAO::ICE>> {}
+  class ContextObject <<IAO::ICE>> {}
+  class DiscursiveStrategy <<IAO::ICE>> {}
+  Keyword --|> ExplanationElement
+  ContextObject --|> ExplanationElement
+  DiscursiveStrategy --|> ExplanationElement
+  ExplanationElement --|> IAO_ICE
+  Keyword --|> IAO_ICE
+  ContextObject --|> IAO_ICE
+  DiscursiveStrategy --|> IAO_ICE
+
+  class ExplanationFragment <<IAO::ICE>> {}
+  ExplanationFragment --|> IAO_ICE
+
+  class IntelligenceActivation <<IAO::ICE>> {
+    +hasActivationScore: decimal <<functional>>
+    +hasWeight: decimal
+  }
+  IntelligenceActivation --|> IAO_ICE
+
+  class EvocationProcess <<BFO::Process>> {}
+  EvocationProcess --|> BFO_Process
+
+  class MIProfileVector <<IAO::ICE>> {
+    +miVector: string <<functional>>  ' vetor percentual 8D
+  }
+  MIProfileVector --|> IAO_ICE
+
+  enum ActivationType <<vocabulary>> {
+    Primary
+    Secondary
+  }
+}
+
+' Propriedades como associações
+ExplanationFragment "1" --> "0..*" ExplanationElement : usesElement\n{⊑ iao:is about}
+ExplanationElement --> IntelligenceDisposition : evokesIntelligence\n{⊑ iao:is about}
+ExplanationFragment "1" o-- "0..*" IntelligenceActivation : hasActivation
+ExplanationFragment "1" o-- "0..1" IntelligenceActivation : hasPrimaryActivation <<functional>>
+ExplanationFragment "1" o-- "0..*" IntelligenceActivation : hasSecondaryActivation
+IntelligenceActivation --> ExplanationFragment : isAboutFragment
+IntelligenceActivation "1" --> "1..*" IntelligenceDisposition : iao:is about
+IntelligenceActivation --> EvocationProcess : denotesProcess
+IntelligenceActivation "1" --> "1" ActivationType : hasActivationType <<functional>>
+
+' Notas de conformidade SHACL
+note top of IntelligenceActivation
+SHACL:
+- iao:is about -> IntelligenceDisposition (min 1)
+- hasActivationType in {Primary, Secondary} (min 1; funcional => exatamente 1)
+end note
+
+note right of ExplanationFragment
+SHACL:
+- Deve possuir pelo menos:
+  (usesElement >= 1) OU (hasActivation >= 1)
+end note
+
+note right of ExplanationElement
+SHACL:
+- Instanciação direta desaconselhada.
+- Prefira Keyword / ContextObject / DiscursiveStrategy.
+end note
+
+' Convenção documentada
+note bottom
+Convenção: hasPrimaryActivation implica hasActivationType = Primary.
+end note
+
+@enduml
