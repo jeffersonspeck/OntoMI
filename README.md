@@ -122,7 +122,7 @@ The ontology, rationale, and evaluation (competency questions, instances, and qu
 
 **History & releases**
 - **Changelog** → [`releases/CHANGELOG.md`](releases/CHANGELOG.md)  
-- **Release notes** → [`releases/vRELEASE-NOTES-v1.1.0.md`](releases/RELEASE-NOTES-v1.1.0.md)
+- **Release notes** → [`releases/v1.1.0/RELEASE-NOTES.md`](releases/v1.1.0/RELEASE-NOTES.md)
 
 ---
 
