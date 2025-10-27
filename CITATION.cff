@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "OntoMI — BFO-aligned Ontology for Multiple Intelligences"
+message: "If you use this ontology, please cite this repository and the referenced works."
+type: software
+authors:
+  - family-names: "YourLastName"
+    given-names: "YourFirstName"
+repository-code: "https://github.com/your-org/ontomi"
+license: "CC-BY-4.0"
+keywords:
+  - ontology
+  - BFO
+  - IAO
+  - Multiple Intelligences
+  - SABiOx
+preferred-citation:
+  type: article
+  title: "OntoMI: A BFO-aligned ontology for MI"
+  authors:
+    - family-names: "YourLastName"
+      given-names: "YourFirstName"
+  year: 2025

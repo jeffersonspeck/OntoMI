@@ -1,0 +1,15 @@
+# CQ2 — contributing elements for each evocation
+PREFIX onto: <http://purl.org/ontomi/onto#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?fragment ?fragmentLabel ?element ?elementLabel ?evokedInt
+WHERE {
+  ?fragment a onto:ExplanationFragment ;
+            rdfs:label ?fragmentLabel ;
+            onto:usesElement ?element ;
+            onto:hasActivation ?act .
+  ?element onto:evokesIntelligence ?evokedInt .
+  ?act onto:refersTo ?evokedInt .
+  OPTIONAL { ?element rdfs:label ?elementLabel . }
+}
+ORDER BY ?fragment ?elementLabel

@@ -1,0 +1,16 @@
+# Integrity checks (examples)
+
+PREFIX onto: <http://purl.org/ontomi/onto#>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+# 1) Activation must refer to exactly one Intelligence (violations: 0 or >1)
+SELECT ?act (COUNT(?int) AS ?countInt)
+WHERE {
+  ?act rdf:type onto:IntelligenceActivation .
+  OPTIONAL { ?act onto:refersTo ?int . }
+}
+GROUP BY ?act
+HAVING (COUNT(?int) != 1)
+
+# 2) MIVector must have exactly eight positions
+# (Adapt if you store as an ordered list or via separate properties)

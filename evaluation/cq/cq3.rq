@@ -1,0 +1,16 @@
+# CQ3 — primary vs secondary (by tag or score)
+PREFIX onto: <http://purl.org/ontomi/onto#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?fragment ?fragmentLabel ?intelligence ?intLabel ?type ?score
+WHERE {
+  ?fragment a onto:ExplanationFragment ;
+            rdfs:label ?fragmentLabel ;
+            onto:hasActivation ?act .
+  ?act onto:refersTo ?intelligence .
+  OPTIONAL { ?act onto:hasType ?type . }
+  OPTIONAL { ?act onto:hasActivationScore ?score . }
+  OPTIONAL { ?intelligence rdfs:label ?intLabel . }
+}
+ORDER BY ?fragment DESC(?score) ?intLabel

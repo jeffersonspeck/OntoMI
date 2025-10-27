@@ -1,0 +1,13 @@
+# CQ1 — intelligences evoked per fragment
+PREFIX onto: <http://purl.org/ontomi/onto#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?fragment ?fragmentLabel ?intelligence ?intLabel
+WHERE {
+  ?fragment a onto:ExplanationFragment ;
+            rdfs:label ?fragmentLabel ;
+            onto:hasActivation ?act .
+  ?act onto:refersTo ?intelligence .
+  OPTIONAL { ?intelligence rdfs:label ?intLabel . }
+}
+ORDER BY ?fragment ?intLabel
