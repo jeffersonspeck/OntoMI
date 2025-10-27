@@ -128,7 +128,16 @@ The ontology, rationale, and evaluation (competency questions, instances, and qu
 
 ## How to cite
 
-Please cite the ontology and include key references from [`citations/references.bib`](citations/references.bib), e.g., BFO 2020 (ISO/IEC 21838-2), IAO (OBO Foundry), Ontology Development 101, and SABiOx.
+If you use OntoMI, please cite the repository and the preferred paper.
+
+**Software (this repository):**
+- OntoMI — Ontology for Multiple Intelligences. CC-BY-4.0.  
+  Repository: https://github.com/jeffersonspeck/OntoMI
+
+**Preferred citation:**
+- Specl, Jefferson Rodrigo. *OntoMI: A Ontology for Multiple Intelligences. 2025*.
+
+> We maintain a machine-readable citation file: [`CITATION.cff`](./CITATION.cff).
 
 ---
 
