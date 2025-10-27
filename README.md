@@ -117,11 +117,12 @@ The ontology, rationale, and evaluation (competency questions, instances, and qu
 - **BFO/IAO alignment** → [`docs/bfo-alignment.md`](docs/bfo-alignment.md)  
 - **Design decisions** → [`docs/design-decisions.md`](docs/design-decisions.md)  
 - **Evaluation plan** → [`docs/evaluation-plan.md`](docs/evaluation-plan.md)  
+- **Competency questions guide** → [`docs/cq-guide.md`](docs/cq-guide.md)
 - **Competency questions (CQ1–CQ3)** → [`docs/competency-questions.md`](docs/competency-questions.md)
 
 **History & releases**
 - **Changelog** → [`releases/CHANGELOG.md`](releases/CHANGELOG.md)  
-- **Release notes** → [`releases/RELEASE-NOTES-v1.1.0.md`](releases/RELEASE-NOTES-v1.1.0.md)
+- **Release notes** → [`releases/vRELEASE-NOTES-v1.1.0.md`](releases/RELEASE-NOTES-v1.1.0.md)
 
 ---
 
