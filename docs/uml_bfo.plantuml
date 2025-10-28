@@ -1,0 +1,81 @@
+@startuml
+hide empty members
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' Estereótipos:
+' <<ICE>> = IAO: Information Content Entity
+' <<Occurrent>> = BFO: Occurrent
+' <<Type>> = Tipo conceitual estável
+
+enum ActivationType {
+  primary
+  secondary
+}
+
+class ExplanationFragment <<ICE>> {
+  +iri: IRI
+  +text: string
+}
+
+abstract class ExplanationElement <<ICE>> {
+  +iri: IRI
+  +label: string
+}
+
+class Keyword <<ICE>>
+class ContextObject <<ICE>>
+class DiscursiveStrategy <<ICE>>
+
+class Intelligence <<Type>> {
+  +iri: IRI
+  +label: string
+}
+
+class IntelligenceActivation <<Occurrent>> {
+  +iri: IRI
+  +hasType: ActivationType  ' functional
+}
+
+' Especializações
+ExplanationElement <|-- Keyword
+ExplanationElement <|-- ContextObject
+ExplanationElement <|-- DiscursiveStrategy
+
+' Relações (tudo em uma ÚNICA linha)
+ExplanationFragment "1" o-- "0..*" ExplanationElement : usesElement
+ExplanationElement "1" --> "1..*" Intelligence : evokesIntelligence
+ExplanationFragment "1" o-- "0..*" IntelligenceActivation : hasActivation
+IntelligenceActivation "1" --> "1" Intelligence : refersTo
+
+' Notas
+note right of ExplanationElement
+  Disjoint classes:
+  - Keyword
+  - ContextObject
+  - DiscursiveStrategy
+end note
+
+note bottom of IntelligenceActivation
+  Reified event (BFO: Occurrent).
+  depends on:
+    - ExplanationFragment (context)
+    - Intelligence (target)
+  hasType is functional (primary|secondary).
+end note
+
+note top of ExplanationFragment
+  IAO: Information Content Entity (ICE).
+  Container dos elementos semânticos usados na inferência.
+end note
+
+note as N1
+  Domínios/alcances mínimos:
+   - usesElement: Fragment -> Element
+   - evokesIntelligence: Element -> Intelligence
+   - hasActivation: Fragment -> Activation
+   - refersTo: Activation -> Intelligence
+end note
+N1 .. ExplanationFragment
+
+@enduml

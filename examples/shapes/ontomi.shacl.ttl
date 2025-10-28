@@ -1,0 +1,231 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix dct:  <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix iao:  <http://purl.obolibrary.org/obo/IAO_> .
+@prefix bfo:  <http://purl.obolibrary.org/obo/BFO_> .
+@prefix onto: <https://w3id.org/ontomi#> .
+
+#################################################################
+# OntoMI — SHACL shapes
+# Purpose: validate key modeling commitments (domains/ranges, disjointness,
+#          functional/cardinality constraints, abstract classes) as used in the thesis.
+# Note: these shapes are conservative and do not attempt to re-classify data;
+#       they only flag violations.
+#################################################################
+
+############################
+# Helper node shapes
+############################
+
+onto:ExplanationElementShape a sh:NodeShape ;
+  sh:property [
+    sh:path rdf:type ;
+    sh:hasValue onto:ExplanationElement ;
+    sh:minCount 1 ;
+    sh:message "Node must be typed as onto:ExplanationElement."@en ;
+  ] .
+
+onto:KeywordShape a sh:NodeShape ;
+  sh:targetClass onto:Keyword ;
+  sh:message "Keyword-specific constraints failed."@en ;
+  # Must NOT be typed as a ContextObject or DiscursiveStrategy too
+  sh:not [ sh:property [
+            sh:path rdf:type ;
+            sh:in ( onto:ContextObject onto:DiscursiveStrategy ) ;
+            sh:minCount 1 ;
+          ] ] .
+
+onto:ContextObjectShape a sh:NodeShape ;
+  sh:targetClass onto:ContextObject ;
+  sh:not [ sh:property [
+            sh:path rdf:type ;
+            sh:in ( onto:Keyword onto:DiscursiveStrategy ) ;
+            sh:minCount 1 ;
+          ] ] ;
+  sh:message "ContextObject cannot also be Keyword or DiscursiveStrategy."@en .
+
+onto:DiscursiveStrategyShape a sh:NodeShape ;
+  sh:targetClass onto:DiscursiveStrategy ;
+  sh:not [ sh:property [
+            sh:path rdf:type ;
+            sh:in ( onto:Keyword onto:ContextObject ) ;
+            sh:minCount 1 ;
+          ] ] ;
+  sh:message "DiscursiveStrategy cannot also be Keyword or ContextObject."@en .
+
+############################
+# Abstract class guard
+############################
+
+# ExplanationElement is abstract: do not allow direct instances
+onto:ExplanationElementAbstractGuard a sh:NodeShape ;
+  sh:targetClass onto:ExplanationElement ;
+  sh:severity sh:Violation ;
+  sh:message "onto:ExplanationElement is abstract; use one of its concrete subclasses (Keyword, ContextObject, DiscursiveStrategy)."@en ;
+  # A node is in violation if it has rdf:type onto:ExplanationElement AND does not have any of the concrete subclass types
+  sh:or (
+    [ sh:property [ sh:path rdf:type ; sh:hasValue onto:Keyword            ; sh:minCount 1 ] ]
+    [ sh:property [ sh:path rdf:type ; sh:hasValue onto:ContextObject      ; sh:minCount 1 ] ]
+    [ sh:property [ sh:path rdf:type ; sh:hasValue onto:DiscursiveStrategy ; sh:minCount 1 ] ]
+  ) ;
+  sh:deactivated false .
+
+############################
+# ExplanationFragment constraints
+############################
+
+onto:ExplanationFragmentShape a sh:NodeShape ;
+  sh:targetClass onto:ExplanationFragment ;
+  sh:message "ExplanationFragment constraints violated."@en ;
+  # Domain/range for usesElement: EF -> ExplanationElement (concrete subclasses)
+  sh:property [
+    sh:path onto:usesElement ;
+    sh:minCount 0 ;
+    sh:nodeKind sh:IRIOrLiteral ;
+    sh:or (
+      [ sh:class onto:Keyword ]
+      [ sh:class onto:ContextObject ]
+      [ sh:class onto:DiscursiveStrategy ]
+    ) ;
+    sh:message "usesElement must point to Keyword, ContextObject, or DiscursiveStrategy."@en
+  ] ;
+  # Domain/range for hasActivation: EF -> IntelligenceActivation
+  sh:property [
+    sh:path onto:hasActivation ;
+    sh:minCount 0 ;
+    sh:class onto:IntelligenceActivation ;
+    sh:message "hasActivation must point to an IntelligenceActivation."@en
+  ] .
+
+############################
+# IntelligenceActivation constraints
+############################
+
+onto:IntelligenceActivationShape a sh:NodeShape ;
+  sh:targetClass onto:IntelligenceActivation ;
+  sh:message "IntelligenceActivation constraints violated."@en ;
+  # Every activation must refer to exactly one Intelligence
+  sh:property [
+    sh:path onto:refersTo ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class onto:Intelligence ;
+    sh:message "refersTo must have exactly one value of type onto:Intelligence."@en
+  ] ;
+  # Functional data property hasType with controlled vocabulary
+  sh:property [
+    sh:path onto:hasType ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ( "primary" "secondary" "primária" "secundária" ) ;
+    sh:message "hasType must be one of: primary | secondary | primária | secundária."@en
+  ] ;
+  # Must be linked (inverse) from some ExplanationFragment via hasActivation
+  sh:property [
+    sh:path [ sh:inversePath onto:hasActivation ] ;
+    sh:minCount 1 ;
+    sh:message "Each IntelligenceActivation must be linked from some ExplanationFragment via hasActivation."@en
+  ] .
+
+############################
+# ExplanationElement (concrete) constraints
+############################
+
+onto:ExplanationElementConcreteShape a sh:NodeShape ;
+  sh:target [
+    a sh:SPARQLTarget ;
+    sh:prefixes [
+      sh:declare [
+        sh:prefix "onto" ;
+        sh:namespace "https://w3id.org/ontomi#" ;
+      ]
+    ] ;
+    sh:select """
+      SELECT ?this WHERE {
+        ?this rdf:type ?t .
+        FILTER (?t IN (onto:Keyword, onto:ContextObject, onto:DiscursiveStrategy))
+      }
+    """ ;
+  ] ;
+  sh:message "ExplanationElement (concrete) constraints violated."@en ;
+  # Range for evokesIntelligence: must point to an onto:Intelligence
+  sh:property [
+    sh:path onto:evokesIntelligence ;
+    sh:minCount 0 ;
+    sh:class onto:Intelligence ;
+    sh:message "evokesIntelligence must point to an onto:Intelligence."@en
+  ] .
+
+############################
+# Property shapes to enforce domains/ranges globally
+############################
+
+onto:usesElementShape a sh:PropertyShape ;
+  sh:path onto:usesElement ;
+  sh:message "usesElement domain/range constraints violated."@en ;
+  sh:targetSubjectsOf onto:usesElement ;
+  sh:class onto:ExplanationFragment ;
+  sh:severity sh:Violation .
+
+onto:usesElementRangeShape a sh:PropertyShape ;
+  sh:path onto:usesElement ;
+  sh:targetObjectsOf onto:usesElement ;
+  sh:or ( [ sh:class onto:Keyword ] [ sh:class onto:ContextObject ] [ sh:class onto:DiscursiveStrategy ] ) ;
+  sh:message "usesElement object must be Keyword, ContextObject, or DiscursiveStrategy."@en .
+
+onto:evokesIntelligenceShape a sh:PropertyShape ;
+  sh:path onto:evokesIntelligence ;
+  sh:targetSubjectsOf onto:evokesIntelligence ;
+  sh:or ( [ sh:class onto:Keyword ] [ sh:class onto:ContextObject ] [ sh:class onto:DiscursiveStrategy ] ) ;
+  sh:message "evokesIntelligence subject must be a concrete ExplanationElement."@en .
+
+onto:evokesIntelligenceRangeShape a sh:PropertyShape ;
+  sh:path onto:evokesIntelligence ;
+  sh:targetObjectsOf onto:evokesIntelligence ;
+  sh:class onto:Intelligence ;
+  sh:message "evokesIntelligence object must be onto:Intelligence."@en .
+
+onto:hasActivationDomainShape a sh:PropertyShape ;
+  sh:path onto:hasActivation ;
+  sh:targetSubjectsOf onto:hasActivation ;
+  sh:class onto:ExplanationFragment ;
+  sh:message "hasActivation subject must be onto:ExplanationFragment."@en .
+
+onto:hasActivationRangeShape a sh:PropertyShape ;
+  sh:path onto:hasActivation ;
+  sh:targetObjectsOf onto:hasActivation ;
+  sh:class onto:IntelligenceActivation ;
+  sh:message "hasActivation object must be onto:IntelligenceActivation."@en .
+
+onto:refersToDomainShape a sh:PropertyShape ;
+  sh:path onto:refersTo ;
+  sh:targetSubjectsOf onto:refersTo ;
+  sh:class onto:IntelligenceActivation ;
+  sh:message "refersTo subject must be onto:IntelligenceActivation."@en .
+
+onto:refersToRangeShape a sh:PropertyShape ;
+  sh:path onto:refersTo ;
+  sh:targetObjectsOf onto:refersTo ;
+  sh:class onto:Intelligence ;
+  sh:message "refersTo object must be onto:Intelligence."@en .
+
+onto:hasTypeDomainShape a sh:PropertyShape ;
+  sh:path onto:hasType ;
+  sh:targetSubjectsOf onto:hasType ;
+  sh:class onto:IntelligenceActivation ;
+  sh:message "hasType subject must be onto:IntelligenceActivation."@en .
+
+# Optional: ensure ExplanationFragment actually uses some element
+# Uncomment sh:minCount 1 below if desired.
+# onto:ExplanationFragmentMustUseElement a sh:NodeShape ;
+#   sh:targetClass onto:ExplanationFragment ;
+#   sh:property [
+#     sh:path onto:usesElement ;
+#     sh:minCount 1 ;
+#     sh:message "Each ExplanationFragment is expected to use at least one ExplanationElement."@en
+#   ] .

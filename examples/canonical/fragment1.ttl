@@ -1,0 +1,48 @@
+@prefix onto: <http://purl.org/ontomi/onto#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# --- Core classes (referenced) ---
+# onto:ExplanationFragment, onto:ExplanationElement, onto:Keyword, onto:ContextObject, onto:DiscursiveStrategy
+# onto:Intelligence, onto:IntelligenceActivation
+# Properties: onto:usesElement, onto:evokesIntelligence, onto:hasActivation, onto:refersTo, onto:hasType, onto:hasActivationScore
+
+# --- Intelligence individuals (reference types) ---
+onto:Intelligence_Musical a onto:Intelligence ;
+  rdfs:label "Musical"@pt .
+
+onto:Intelligence_Kinesthetic a onto:Intelligence ;
+  rdfs:label "Cinestésico-corporal"@pt .
+
+# --- An example fragment ---
+onto:fragment_palmas_movimento a onto:ExplanationFragment ;
+  rdfs:label "Fragmento: palmas e movimento constante"@pt ;
+  onto:usesElement onto:kw_ritmo , onto:ctx_ritual , onto:ds_ritual_sonoro ;
+  onto:hasActivation onto:act_musical_primary , onto:act_kine_secondary .
+
+# Elements used by the fragment
+onto:kw_ritmo a onto:Keyword ;
+  rdfs:label "ritmo"@pt ;
+  onto:evokesIntelligence onto:Intelligence_Musical .
+
+onto:ctx_ritual a onto:ContextObject ;
+  rdfs:label "ritual de movimento"@pt ;
+  onto:evokesIntelligence onto:Intelligence_Kinesthetic ;
+  onto:evokesIntelligence onto:Intelligence_Musical .
+
+onto:ds_ritual_sonoro a onto:DiscursiveStrategy ;
+  rdfs:label "ritual sonoro com palmas e batidas"@pt ;
+  onto:evokesIntelligence onto:Intelligence_Musical ;
+  onto:evokesIntelligence onto:Intelligence_Kinesthetic .
+
+# Activations (reified, event-like)
+onto:act_musical_primary a onto:IntelligenceActivation ;
+  onto:refersTo onto:Intelligence_Musical ;
+  onto:hasType "primary" ;
+  onto:hasActivationScore "0.80"^^xsd:decimal .
+
+onto:act_kine_secondary a onto:IntelligenceActivation ;
+  onto:refersTo onto:Intelligence_Kinesthetic ;
+  onto:hasType "secondary" ;
+  onto:hasActivationScore "0.60"^^xsd:decimal .
