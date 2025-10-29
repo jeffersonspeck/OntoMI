@@ -284,35 +284,134 @@ onto:hasNaturalistScore            a owl:DatatypeProperty , owl:FunctionalProper
 #################################################################
 # SHACL (regras de validação de instâncias)
 #################################################################
-# 1) Não instanciar ExplanationElement diretamente
+
+#################################################################
+# 1) Advisory: evitar instanciar ExplanationElement diretamente
+#################################################################
 onto:ExplanationElementAdvisoryShape a sh:NodeShape ;
   sh:targetClass onto:ExplanationElement ;
-  sh:closed true ;
+  sh:severity sh:Warning ;
   sh:message "Instanciação direta de ExplanationElement não recomendada; use Keyword, ContextObject ou DiscursiveStrategy."@pt .
 
-# 2) ExplanationFragment precisa de usesElement OU hasActivation
+#################################################################
+# 2) Fragmento deve ter usesElement OU hasActivation; e no máx. 1 primária
+#################################################################
 onto:ExplanationFragmentShape a sh:NodeShape ;
   sh:targetClass onto:ExplanationFragment ;
   sh:message "ExplanationFragment deve possuir pelo menos uma ligação semântica (usesElement) ou uma ativação (hasActivation)."@pt ;
   sh:or (
-    [ sh:property [ sh:path onto:usesElement   ; sh:minCount 1 ] ]
-    [ sh:property [ sh:path onto:hasActivation ; sh:minCount 1 ] ]
-  ) .
+    [ sh:property [ sh:path onto:usesElement ;    sh:minCount 1 ] ]
+    [ sh:property [ sh:path onto:hasActivation ;  sh:minCount 1 ] ]
+  ) ;
+  sh:property [
+    sh:path onto:hasPrimaryActivation ;
+    sh:maxCount 1 ;
+    sh:message "Cada fragmento deve ter no máximo uma ativação primária."@pt
+  ] .
 
-# 3) IntelligenceActivation deve:
-#    a) 'is about' (iao:0000136) alguma IntelligenceDisposition
-#    b) possuir hasActivationType em {Primary, Secondary}
+#################################################################
+# 3) Ativação de inteligência: is_about, tipo, score em [0,1]
+#    + coerência entre hasPrimary/hasSecondary e hasActivationType
+#################################################################
 onto:IntelligenceActivationShape a sh:NodeShape ;
   sh:targetClass onto:IntelligenceActivation ;
-  sh:property [
-    sh:path iao:0000136 ;
-    sh:minCount 1 ;
-    sh:class onto:IntelligenceDisposition ;
-    sh:message "IntelligenceActivation deve apontar para uma IntelligenceDisposition via iao:is about."@pt
+
+  # (a-B) Deve ter iao:is_about apontando para:
+  #      • uma INSTÂNCIA de (sub)classe de IntelligenceDisposition, OU
+  #      • uma CLASSE que seja subclasse (transitiva) de IntelligenceDisposition.
+  # Se nada disso for verdade, gera violação.
+  sh:sparql [
+    sh:message "IntelligenceActivation deve apontar (via iao:is about) para instância de (sub)classe de IntelligenceDisposition OU para uma classe que seja subclasse de IntelligenceDisposition."@pt ;
+    sh:select """
+      PREFIX iao:  <http://purl.obolibrary.org/obo/IAO_>
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX onto: <https://techcoop.com.br/ontomi#>
+      SELECT ?this WHERE {
+        FILTER NOT EXISTS {
+          ?this iao:0000136 ?x .
+          {
+            # Caso 1: ?x é instância de uma subclasse (ou da própria) IntelligenceDisposition
+            ?x a/rdfs:subClassOf* onto:IntelligenceDisposition
+          }
+          UNION
+          {
+            # Caso 2: ?x é CLASSE subclasse (transitiva) de IntelligenceDisposition
+            ?x rdfs:subClassOf+ onto:IntelligenceDisposition
+          }
+        }
+      }
+    """
   ] ;
+
+  # (b) Tipo obrigatório em {Primary, Secondary}
   sh:property [
     sh:path onto:hasActivationType ;
-    sh:in ( onto:Primary onto:Secondary ) ;
     sh:minCount 1 ;
+    sh:in ( onto:Primary onto:Secondary ) ;
     sh:message "IntelligenceActivation deve possuir um tipo válido (primária/secundária)."@pt
+  ] ;
+
+  # (c) Score em [0,1] (xsd:decimal)
+  sh:property [
+    sh:path onto:hasActivationScore ;
+    sh:datatype xsd:decimal ;
+    sh:minInclusive 0.0 ;
+    sh:maxInclusive 1.0 ;
+    sh:message "Scores de ativação devem estar em [0,1]."@pt
+  ] ;
+
+  # (d) Coerência: se fragmento liga via hasPrimaryActivation => tipo Primary
+  sh:sparql [
+    sh:message "Ativação ligada por hasPrimaryActivation deve ter tipo Primary."@pt ;
+    sh:select """
+      PREFIX onto: <https://techcoop.com.br/ontomi#>
+      SELECT ?this WHERE {
+        ?frag onto:hasPrimaryActivation ?this .
+        FILTER NOT EXISTS { ?this onto:hasActivationType onto:Primary }
+      }
+    """
+  ] ;
+
+  # (e) Coerência: se fragmento liga via hasSecondaryActivation => tipo Secondary
+  sh:sparql [
+    sh:message "Ativação ligada por hasSecondaryActivation deve ter tipo Secondary."@pt ;
+    sh:select """
+      PREFIX onto: <https://techcoop.com.br/ontomi#>
+      SELECT ?this WHERE {
+        ?frag onto:hasSecondaryActivation ?this .
+        FILTER NOT EXISTS { ?this onto:hasActivationType onto:Secondary }
+      }
+    """
   ] .
+
+#################################################################
+# 4) Vetor MI: ou miVector (string) OU os 8 campos atômicos;
+#    regex básica para miVector (aviso)
+#################################################################
+onto:MIProfileVectorShape a sh:NodeShape ;
+  sh:targetClass onto:MIProfileVector ;
+
+  # OU tem miVector, OU tem os 8 campos atômicos
+  sh:or (
+    [ sh:property [ sh:path onto:miVector ; sh:minCount 1 ] ]
+    [ sh:property
+        [ sh:path onto:hasLinguisticScore           ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasLogicalMathematicalScore  ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasSpatialScore              ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasBodilyKinestheticScore    ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasMusicalScore              ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasInterpersonalScore        ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasIntrapersonalScore        ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasNaturalistScore           ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ]
+    ]
+  ) ;
+
+  # Regex de formato do miVector (8 números separados por vírgula) — Warning
+  sh:property [
+    sh:path onto:miVector ;
+    sh:pattern "^[0-9]+(\\.[0-9]+)?(,[0-9]+(\\.[0-9]+)?){7}$" ;
+    sh:flags "i" ;
+    sh:severity sh:Warning ;
+    sh:message "miVector deve ter 8 valores numéricos separados por vírgulas (ex.: 18.29,46.34,35.37,0.00,0.00,0.00,0.00,0.00)."@pt
+  ] .
+

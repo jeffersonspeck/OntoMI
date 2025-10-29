@@ -2,7 +2,24 @@
 All notable changes to this project are documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/) and follows the style of [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [1.1.0] - 2025-10-27
+## [1.2.0] - 2025-10-29
+### Added
+- **SHACL validation layer** with three shapes:
+  - `ExplanationElementAdvisoryShape` (warning severity).
+  - `ExplanationFragmentShape` (requires `usesElement` **or** `hasActivation`).
+  - `IntelligenceActivationShape` enforcing: `iao:is about` points to an **IntelligenceDisposition** instance **or** a subclass IRI; `hasActivationType` ∈ {`Primary`,`Secondary`}; `hasActivationScore` in **[0,1]**; and SPARQL rules for primary/secondary coherence.
+- **ABox‑light validation strategy (Option B)** documented.
+
+### Changed
+- Clarified validation semantics so pipelines that link activations to **class IRIs** (e.g., `onto:SpatialIntelligence`) are valid without materializing individuals for each intelligence.
+
+### Fixed
+- Typical data issues now flagged by SHACL: missing activation type and out‑of‑range scores.
+
+### Migration
+- Populate `hasActivationType` during activation generation and normalize scores to **[0,1]**. Re‑run SHACL and fix any violations.
+
+## [1.1.0] - 2025-09-27
 ### Added
 - **Foundational alignment** to **BFO 2020** (ISO/IEC 21838-2) and **IAO** (OBO Foundry) documented across the TBox.
   - Classes and properties anchored to BFO upper categories (e.g., `IntelligenceActivation` as **occurrent**; `ExplanationFragment` and explanatory elements as **information content entities** via IAO).
@@ -37,23 +54,3 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
   - Core object properties: `usesElement`, `evokesIntelligence`, `hasActivation`, `refersTo`.
   - Core data property: `hasType` (activation type).
 - Example instances for validation and reasoning.
-
-[1.1.0]: https://example.org/ontomi/releases/1.1.0
-[1.0.0]: https://example.org/ontomi/releases/1.0.0
-
-## [1.2.0] - 2025-10-29
-### Added
-- **SHACL validation layer** with three shapes:
-  - `ExplanationElementAdvisoryShape` (warning severity).
-  - `ExplanationFragmentShape` (requires `usesElement` **or** `hasActivation`).
-  - `IntelligenceActivationShape` enforcing: `iao:is about` points to an **IntelligenceDisposition** instance **or** a subclass IRI; `hasActivationType` ∈ {`Primary`,`Secondary`}; `hasActivationScore` in **[0,1]**; and SPARQL rules for primary/secondary coherence.
-- **ABox‑light validation strategy (Option B)** documented.
-
-### Changed
-- Clarified validation semantics so pipelines that link activations to **class IRIs** (e.g., `onto:SpatialIntelligence`) are valid without materializing individuals for each intelligence.
-
-### Fixed
-- Typical data issues now flagged by SHACL: missing activation type and out‑of‑range scores.
-
-### Migration
-- Populate `hasActivationType` during activation generation and normalize scores to **[0,1]**. Re‑run SHACL and fix any violations.
