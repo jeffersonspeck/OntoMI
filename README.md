@@ -1,5 +1,5 @@
 # OntoMI — An Ontology for Multiple Intelligences in Texts
-[![versão](https://img.shields.io/badge/vers%C3%A3o-1.1.0-blue?style=flat-square)](#)
+[![versão](https://img.shields.io/badge/vers%C3%A3o-1.3.0-blue?style=flat-square)](#)
 [![formato](https://img.shields.io/badge/formato-OWL%20%2F%20TTL-0B7285?style=flat-square)](https://www.w3.org/TR/owl2-overview/)
 [![base](https://img.shields.io/badge/base-BFO%20%2B%20IAO-6C757D?style=flat-square)](https://basic-formal-ontology.org/)
 
@@ -66,9 +66,8 @@ The ontology, rationale, and evaluation (competency questions, instances, and qu
 │ ├── profiles/
 │ │ └── profiles.md               # OWL profile, IRIs, naming, annotation policy (OBO-style)
 │ └── releases/
-│   ├── v1.1.0/
+│   ├── vX.X.X/
 │   │ ├── ontomi.ttl
-│   │ ├── checks/             # reasoner reports, SPARQL validation
 │   │ └── RELEASE-NOTES.md
 │   └── CHANGELOG.md
 ├── docs/

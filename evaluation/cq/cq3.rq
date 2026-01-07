@@ -1,16 +1,42 @@
-# CQ3 — primary vs secondary (by tag or score)
-PREFIX onto: <http://purl.org/ontomi/onto#>
+# CQ3 — TOP intelligence por fragmento (maior intensidade), com desempate por Primary
+PREFIX onto: <https://techcoop.com.br/ontomi#>
+PREFIX iao:  <http://purl.obolibrary.org/obo/IAO_>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
 
-SELECT ?fragment ?fragmentLabel ?intelligence ?intLabel ?type ?score
+SELECT DISTINCT
+  ?fragment ?fragmentLabel
+  ?intelligence ?intLabel
+  ?type ?score
 WHERE {
-  ?fragment a onto:ExplanationFragment ;
-            rdfs:label ?fragmentLabel ;
-            onto:hasActivation ?act .
-  ?act onto:refersTo ?intelligence .
-  OPTIONAL { ?act onto:hasType ?type . }
+  ?fragment rdf:type onto:ExplanationFragment .
+  OPTIONAL { ?fragment rdfs:label ?fragmentLabel . }
+
+  ?fragment onto:hasActivation ?act .
+  ?act iao:0000136 ?intelligence .
   OPTIONAL { ?act onto:hasActivationScore ?score . }
-  OPTIONAL { ?intelligence rdfs:label ?intLabel . }
+  OPTIONAL { ?act onto:hasActivationType  ?atype . }
+
+  # label pt -> en -> fallback
+  OPTIONAL { ?intelligence rdfs:label ?intLabel_pt FILTER (lang(?intLabel_pt) = "pt") }
+  OPTIONAL { ?intelligence rdfs:label ?intLabel_en FILTER (lang(?intLabel_en) = "en") }
+  BIND(COALESCE(?intLabel_pt, ?intLabel_en, STRAFTER(STR(?intelligence), "#")) AS ?intLabel)
+
+  # type: tenta ler do próprio act; senão infere pelo predicado do fragmento
+  BIND(
+    COALESCE(
+      IF(BOUND(?atype), STRAFTER(STR(?atype), "#"), UNDEF),
+      IF(EXISTS { ?fragment onto:hasPrimaryActivation   ?act }, "Primary",
+        IF(EXISTS { ?fragment onto:hasSecondaryActivation ?act }, "Secondary", UNDEF)
+      )
+    ) AS ?type
+  )
+
+  # mantém apenas as ativações máximas por fragmento
+  FILTER NOT EXISTS {
+    ?fragment onto:hasActivation ?act2 .
+    ?act2 onto:hasActivationScore ?s2 .
+    FILTER( ?s2 > ?score )
+  }
 }
-ORDER BY ?fragment DESC(?score) ?intLabel
+ORDER BY ?fragment DESC(?score) (?type != "Primary") LCASE(STR(?intLabel))

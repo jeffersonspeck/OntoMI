@@ -29,7 +29,11 @@
   dct:modified "2025-10-29"^^xsd:date .
 
 #################################################################
-# 1) (Advisory) Não instanciar ExplanationElement diretamente
+# SHACL (regras de validação de instâncias)
+#################################################################
+
+#################################################################
+# 1) Advisory: evitar instanciar ExplanationElement diretamente
 #################################################################
 onto:ExplanationElementAdvisoryShape a sh:NodeShape ;
   sh:targetClass onto:ExplanationElement ;
@@ -37,39 +41,77 @@ onto:ExplanationElementAdvisoryShape a sh:NodeShape ;
   sh:message "Instanciação direta de ExplanationElement não recomendada; use Keyword, ContextObject ou DiscursiveStrategy."@pt .
 
 #################################################################
-# 2) ExplanationFragment precisa de usesElement OU hasActivation
+# 2) Fragmento deve ter usesElement OU hasActivation; e no máx. 1 primária
 #################################################################
 onto:ExplanationFragmentShape a sh:NodeShape ;
   sh:targetClass onto:ExplanationFragment ;
   sh:message "ExplanationFragment deve possuir pelo menos uma ligação semântica (usesElement) ou uma ativação (hasActivation)."@pt ;
   sh:or (
-    [ sh:property [ sh:path onto:usesElement   ; sh:minCount 1 ] ]
-    [ sh:property [ sh:path onto:hasActivation ; sh:minCount 1 ] ]
-  ) .
+    [ sh:property [ sh:path onto:usesElement ;    sh:minCount 1 ] ]
+    [ sh:property [ sh:path onto:hasActivation ;  sh:minCount 1 ] ]
+  ) ;
+  sh:property [
+    sh:path onto:hasPrimaryActivation ;
+    sh:maxCount 1 ;
+    sh:message "Cada fragmento deve ter no máximo uma ativação primária."@pt
+  ] .
 
 #################################################################
-# 3) IntelligenceActivation Shape
+# 2b) (NOVO) Fragmento deve estar ligado a um documento
+#################################################################
+onto:ExplanationFragmentDocLinkShape a sh:NodeShape ;
+    sh:targetClass onto:ExplanationFragment ;
+    sh:property [
+        sh:path dct:isPartOf ;
+        sh:minCount 1 ;
+        sh:message "ExplanationFragment deve estar vinculado a um ExplanationDocument (via dct:isPartOf)."@pt
+    ] .
+
+#################################################################
+# 2c) (NOVO) Backlink recomendado: se doc temFragmento frag, frag deve apontar de volta pro doc
+#################################################################
+onto:DocumentFragmentBacklinkShape a sh:NodeShape ;
+    sh:targetClass onto:ExplanationDocument ;
+    sh:severity sh:Warning ;
+    sh:message "Recomendação: todo fragmento listado em dct:hasPart deve apontar de volta para o documento via dct:isPartOf."@pt ;
+    sh:sparql [
+      sh:select """
+        PREFIX dct:  <http://purl.org/dc/terms/>
+        SELECT ?this WHERE {
+          ?this dct:hasPart ?frag .
+          FILTER NOT EXISTS { ?frag dct:isPartOf ?this . }
+        }
+      """
+    ] .
+
+#################################################################
+# 3) Ativação de inteligência: is_about, tipo, score em [0,1]
+#    + coerência entre hasPrimary/hasSecondary e hasActivationType
 #################################################################
 onto:IntelligenceActivationShape a sh:NodeShape ;
   sh:targetClass onto:IntelligenceActivation ;
 
-  # (a) Deve apontar para ao menos 1 IntelligenceDisposition via IAO:is about
-  sh:property [
-    sh:path iao:0000136 ;
-    sh:qualifiedValueShape [
-      # Opção B: aceitar (i) instância OU (ii) IRI de classe subclasse de IntelligenceDisposition
-      sh:or (
-        [ sh:class onto:IntelligenceDisposition ]                                # instância
-        [ sh:nodeKind sh:IRI ;                                                   # classe (IRI)
-          sh:property [ sh:path rdfs:subClassOf ; sh:hasValue onto:IntelligenceDisposition ]
-        ]
-      )
-    ] ;
-    sh:qualifiedMinCount 1 ;
-    sh:message "IntelligenceActivation deve apontar para uma IntelligenceDisposition (instância) ou para classe subclasse de IntelligenceDisposition via iao:is about."@pt
+  sh:sparql [
+    sh:message "IntelligenceActivation deve apontar (via iao:is about) para instância de (sub)classe de IntelligenceDisposition OU para uma classe que seja subclasse de IntelligenceDisposition."@pt ;
+    sh:select """
+      PREFIX iao:  <http://purl.obolibrary.org/obo/IAO_>
+      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+      PREFIX onto: <https://techcoop.com.br/ontomi#>
+      SELECT ?this WHERE {
+        FILTER NOT EXISTS {
+          ?this iao:0000136 ?x .
+          {
+            ?x a/rdfs:subClassOf* onto:IntelligenceDisposition
+          }
+          UNION
+          {
+            ?x rdfs:subClassOf+ onto:IntelligenceDisposition
+          }
+        }
+      }
+    """
   ] ;
 
-  # (b) Tipo obrigatório em {Primary, Secondary}
   sh:property [
     sh:path onto:hasActivationType ;
     sh:minCount 1 ;
@@ -77,7 +119,6 @@ onto:IntelligenceActivationShape a sh:NodeShape ;
     sh:message "IntelligenceActivation deve possuir um tipo válido (primária/secundária)."@pt
   ] ;
 
-  # (c) Score em [0,1] (xsd:decimal)
   sh:property [
     sh:path onto:hasActivationScore ;
     sh:datatype xsd:decimal ;
@@ -86,10 +127,10 @@ onto:IntelligenceActivationShape a sh:NodeShape ;
     sh:message "Scores de ativação devem estar em [0,1]."@pt
   ] ;
 
-  # (d) Coerência: se fragmento liga via hasPrimaryActivation => tipo Primary
   sh:sparql [
     sh:message "Ativação ligada por hasPrimaryActivation deve ter tipo Primary."@pt ;
     sh:select """
+      PREFIX onto: <https://techcoop.com.br/ontomi#>
       SELECT ?this WHERE {
         ?frag onto:hasPrimaryActivation ?this .
         FILTER NOT EXISTS { ?this onto:hasActivationType onto:Primary }
@@ -97,13 +138,59 @@ onto:IntelligenceActivationShape a sh:NodeShape ;
     """
   ] ;
 
-  # (e) Coerência: se fragmento liga via hasSecondaryActivation => tipo Secondary
   sh:sparql [
     sh:message "Ativação ligada por hasSecondaryActivation deve ter tipo Secondary."@pt ;
     sh:select """
+      PREFIX onto: <https://techcoop.com.br/ontomi#>
       SELECT ?this WHERE {
         ?frag onto:hasSecondaryActivation ?this .
         FILTER NOT EXISTS { ?this onto:hasActivationType onto:Secondary }
       }
     """
   ] .
+
+#################################################################
+# 4) Vetor MI: ou miVector (string) OU os 8 campos atômicos;
+#    regex básica para miVector (aviso)
+#################################################################
+onto:MIProfileVectorShape a sh:NodeShape ;
+  sh:targetClass onto:MIProfileVector ;
+
+  sh:or (
+    [ sh:property [ sh:path onto:miVector ; sh:minCount 1 ] ]
+    [ sh:property
+        [ sh:path onto:hasLinguisticScore           ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasLogicalMathematicalScore  ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasSpatialScore              ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasBodilyKinestheticScore    ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasMusicalScore              ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasInterpersonalScore        ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasIntrapersonalScore        ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ],
+        [ sh:path onto:hasNaturalistScore           ; sh:minCount 1 ; sh:datatype xsd:decimal ; sh:minInclusive 0.0 ; sh:maxInclusive 1.0 ]
+    ]
+  ) ;
+
+  sh:property [
+    sh:path onto:miVector ;
+    sh:pattern "^[0-9]+(\\.[0-9]+)?(,[0-9]+(\\.[0-9]+)?){7}$" ;
+    sh:flags "i" ;
+    sh:severity sh:Warning ;
+    sh:message "miVector deve ter 8 valores numéricos separados por vírgulas (ex.: 18.29,46.34,35.37,0.00,0.00,0.00,0.00,0.00)."@pt
+  ] .
+
+#################################################################
+# 5) (NOVO) Documento: deve ter fragmentos e exatamente 1 vetor do documento
+#################################################################
+onto:ExplanationDocumentShape a sh:NodeShape ;
+    sh:targetClass onto:ExplanationDocument ;
+    sh:property [
+        sh:path dct:hasPart ;
+        sh:minCount 1 ;
+        sh:message "ExplanationDocument deve possuir pelo menos um ExplanationFragment (via dct:hasPart)."@pt
+    ] ;
+    sh:property [
+        sh:path onto:hasProfileVector ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "ExplanationDocument deve possuir exatamente 1 MIProfileVector (via onto:hasProfileVector)."@pt
+    ] .

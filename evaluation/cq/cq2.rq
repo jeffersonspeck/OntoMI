@@ -1,15 +1,42 @@
-# CQ2 — contributing elements for each evocation
-PREFIX onto: <http://purl.org/ontomi/onto#>
+# CQ2 — elementos que contribuíram para cada evocação (por fragmento)
+PREFIX onto: <https://techcoop.com.br/ontomi#>
+PREFIX iao:  <http://purl.obolibrary.org/obo/IAO_>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?fragment ?fragmentLabel ?element ?elementLabel ?evokedInt
+SELECT DISTINCT
+  ?fragment ?fragmentLabel
+  ?intelligence ?intLabel
+  ?element ?elementLabel
+  ?etype
 WHERE {
-  ?fragment a onto:ExplanationFragment ;
-            rdfs:label ?fragmentLabel ;
-            onto:usesElement ?element ;
-            onto:hasActivation ?act .
-  ?element onto:evokesIntelligence ?evokedInt .
-  ?act onto:refersTo ?evokedInt .
-  OPTIONAL { ?element rdfs:label ?elementLabel . }
+  ?fragment rdf:type onto:ExplanationFragment .
+  OPTIONAL { ?fragment rdfs:label ?fragmentLabel . }
+
+  # inteligência evocada no fragmento (via ativação)
+  ?fragment onto:hasActivation ?act .
+  ?act iao:0000136 ?intelligence .
+
+  # elementos que evocam a MESMA inteligência
+  ?fragment onto:usesElement ?element .
+  ?element  onto:evokesIntelligence ?intelligence .
+
+  # label preferindo pt -> en -> fallback localname
+  OPTIONAL { ?intelligence rdfs:label ?intLabel_pt FILTER (lang(?intLabel_pt) = "pt") }
+  OPTIONAL { ?intelligence rdfs:label ?intLabel_en FILTER (lang(?intLabel_en) = "en") }
+  BIND(COALESCE(?intLabel_pt, ?intLabel_en, STRAFTER(STR(?intelligence), "#")) AS ?intLabel)
+
+  OPTIONAL { ?element rdfs:label ?elLabel_pt FILTER (lang(?elLabel_pt) = "pt") }
+  OPTIONAL { ?element rdfs:label ?elLabel_en FILTER (lang(?elLabel_en) = "en") }
+  BIND(COALESCE(?elLabel_pt, ?elLabel_en, STRAFTER(STR(?element), "#")) AS ?elementLabel)
+
+  # tipagem do elemento (Keyword/ContextObject/DiscursiveStrategy)
+  BIND(
+    IF(EXISTS { ?element rdf:type onto:Keyword }, "Keyword",
+      IF(EXISTS { ?element rdf:type onto:ContextObject }, "ContextObject",
+        IF(EXISTS { ?element rdf:type onto:DiscursiveStrategy }, "DiscursiveStrategy", "ExplanationElement")
+      )
+    ) AS ?etype
+  )
 }
-ORDER BY ?fragment ?elementLabel
+ORDER BY ?fragment LCASE(STR(?intLabel)) LCASE(STR(?elementLabel))

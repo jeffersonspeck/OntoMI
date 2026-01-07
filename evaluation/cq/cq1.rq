@@ -1,13 +1,24 @@
-# CQ1 — intelligences evoked per fragment
-PREFIX onto: <http://purl.org/ontomi/onto#>
+PREFIX onto: <https://techcoop.com.br/ontomi#>
+PREFIX iao:  <http://purl.obolibrary.org/obo/IAO_>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-SELECT ?fragment ?fragmentLabel ?intelligence ?intLabel
+SELECT DISTINCT
+  ?fragment ?fragmentLabel
+  ?intelligence ?intLabel
+  ?score ?atype
 WHERE {
-  ?fragment a onto:ExplanationFragment ;
-            rdfs:label ?fragmentLabel ;
-            onto:hasActivation ?act .
-  ?act onto:refersTo ?intelligence .
-  OPTIONAL { ?intelligence rdfs:label ?intLabel . }
+  ?fragment rdf:type onto:ExplanationFragment .
+  OPTIONAL { ?fragment rdfs:label ?fragmentLabel . }
+
+  ?fragment onto:hasActivation ?act .
+  ?act iao:0000136 ?intelligence .
+
+  OPTIONAL { ?act onto:hasActivationScore ?score . }
+  OPTIONAL { ?act onto:hasActivationType  ?atype . }
+
+  OPTIONAL { ?intelligence rdfs:label ?intLabel_pt FILTER (lang(?intLabel_pt) = "pt") }
+  OPTIONAL { ?intelligence rdfs:label ?intLabel_en FILTER (lang(?intLabel_en) = "en") }
+  BIND(COALESCE(?intLabel_pt, ?intLabel_en, STRAFTER(STR(?intelligence), "#")) AS ?intLabel)
 }
-ORDER BY ?fragment ?intLabel
+ORDER BY ?fragment LCASE(STR(?intLabel))
