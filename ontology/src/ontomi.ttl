@@ -15,7 +15,7 @@
 <https://techcoop.com.br/ontomi>
   a owl:Ontology ;
   owl:versionIRI   <https://techcoop.com.br/ontomi/2025-10> ;
-  owl:versionInfo  "1.1.0 (2025-10-27)" ;
+  owl:versionInfo  "1.3.0 (2026-01-07)" ;
   dct:title        "OntoMI: Ontology for Multiple Intelligences in Educational Texts"@en ,
                    "OntoMI: Ontologia para Inteligências Múltiplas em Textos Educacionais"@pt ;
   dct:isVersionOf  <https://techcoop.com.br/ontomi> ;
@@ -485,3 +485,4 @@ onto:ExplanationDocumentShape a sh:NodeShape ;
         sh:maxCount 1 ;
         sh:message "ExplanationDocument deve possuir exatamente 1 MIProfileVector (via onto:hasProfileVector)."@pt
     ] .
+
